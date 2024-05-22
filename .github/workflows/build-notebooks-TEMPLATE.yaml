@@ -73,7 +73,7 @@ jobs:
       - name: Workaround for missing pasta binary in linuxbrew
         run: |
           mkdir -p $HOME/.config/containers/
-          cp container.conf $HOME/.config/containers/containers.conf
+          cp containers.conf $HOME/.config/containers/containers.conf
 
       - name: Add linuxbrew to PATH
         run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
