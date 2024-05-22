@@ -25,63 +25,93 @@ jobs:
         id: gen
 
   # base images
-  level0:
+#  level0:
+#    needs: [ "gen" ]
+#    strategy:
+#      fail-fast: false
+#      matrix: "${{ fromJson(needs.gen.outputs.level0) }}"
+#    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+#    with:
+#      target: "${{ matrix.target }}"
+#    secrets: inherit
+
+  level1test:
     needs: [ "gen" ]
     strategy:
       fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level0) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  level0test:
-    needs: [ "gen", "level0" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level0) }}"
+      matrix: "${{ fromJson(needs.gen.outputs.level1) }}"
     uses: ./.github/workflows/test-notebooks-TEMPLATE.yaml
     with:
       target: "${{ matrix.target }}"
     secrets: inherit
 
-  # images that only depend on base images
-  level1:
-    needs: [ "gen", "level0" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level1) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  level2:
-    needs: [ "gen", "level1" ]
+  level2test:
+    needs: [ "gen" ]
     strategy:
       fail-fast: false
       matrix: "${{ fromJson(needs.gen.outputs.level2) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+    uses: ./.github/workflows/test-notebooks-TEMPLATE.yaml
     with:
       target: "${{ matrix.target }}"
     secrets: inherit
 
-  level3:
-    needs: [ "gen", "level2" ]
+  level3test:
+    needs: [ "gen" ]
     strategy:
       fail-fast: false
       matrix: "${{ fromJson(needs.gen.outputs.level3) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+    uses: ./.github/workflows/test-notebooks-TEMPLATE.yaml
     with:
       target: "${{ matrix.target }}"
     secrets: inherit
 
-  level4:
-    needs: [ "gen", "level3" ]
+  level4test:
+    needs: [ "gen" ]
     strategy:
       fail-fast: false
       matrix: "${{ fromJson(needs.gen.outputs.level4) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+    uses: ./.github/workflows/test-notebooks-TEMPLATE.yaml
     with:
       target: "${{ matrix.target }}"
     secrets: inherit
+#
+#  # images that only depend on base images
+#  level1:
+#    needs: [ "gen", "level0" ]
+#    strategy:
+#      fail-fast: false
+#      matrix: "${{ fromJson(needs.gen.outputs.level1) }}"
+#    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+#    with:
+#      target: "${{ matrix.target }}"
+#    secrets: inherit
+#
+#  level2:
+#    needs: [ "gen", "level1" ]
+#    strategy:
+#      fail-fast: false
+#      matrix: "${{ fromJson(needs.gen.outputs.level2) }}"
+#    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+#    with:
+#      target: "${{ matrix.target }}"
+#    secrets: inherit
+#
+#  level3:
+#    needs: [ "gen", "level2" ]
+#    strategy:
+#      fail-fast: false
+#      matrix: "${{ fromJson(needs.gen.outputs.level3) }}"
+#    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+#    with:
+#      target: "${{ matrix.target }}"
+#    secrets: inherit
+#
+#  level4:
+#    needs: [ "gen", "level3" ]
+#    strategy:
+#      fail-fast: false
+#      matrix: "${{ fromJson(needs.gen.outputs.level4) }}"
+#    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
+#    with:
+#      target: "${{ matrix.target }}"
+#    secrets: inherit
