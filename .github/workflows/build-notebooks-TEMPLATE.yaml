@@ -85,6 +85,9 @@ jobs:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           /home/linuxbrew/.linuxbrew/bin/brew install podman
 
+      - name: Add linuxbrew to PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
+
       - name: Workaround for missing pasta binary in linuxbrew
         run: |
           mkdir -p $HOME/.config/containers/
@@ -92,9 +95,6 @@ jobs:
           cp storage.conf $HOME/.config/containers/storage.conf
           # should at least reset storage when touching storage.conf
           podman system reset --force
-
-      - name: Add linuxbrew to PATH
-        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
 
       - run: "make ${{ inputs.target }}"
         env:
