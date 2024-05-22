@@ -89,7 +89,16 @@ def print_github_actions_matrix(levels: dict[str, int]) -> None:
     """
     with open(os.environ["GITHUB_OUTPUT"], "at") as f:
         for level in set(levels.values()):
-            matrix = {"target": list(l for l, v in levels.items() if v == level)}
+            targets: list[str] = list(l for l, v in levels.items() if v == level)
+
+            # in level 0, we only want base images, not other utility tasks
+            if level == 0:
+                targets = [t for t in targets if t.startswith("base-")]
+
+            # we won't build rhel-based images because they need subscription
+            targets = [t for t in targets if "rhel" not in t]
+
+            matrix = {"target": targets}
             f.write(f"level{level}={json.dumps(matrix, separators=(",", ":"))}")
 
 
