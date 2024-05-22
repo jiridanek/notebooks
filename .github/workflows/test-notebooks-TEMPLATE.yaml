@@ -68,11 +68,12 @@ jobs:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
       - run: |
-          kubectl get statefulset -A
-          kubectl describe statefulset -A
+          kubectl get statefulset -n default
+          kubectl describe statefulset -n default
           sleep 60
-          kubectl get statefulset -A
-          kubectl describe statefulset -A
+          kubectl get statefulset -n default
+          kubectl describe statefulset -n default
+          kubectl describe pod -n default
 
       - run: "make test-${{ inputs.target }}"
         env:
