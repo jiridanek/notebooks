@@ -55,7 +55,17 @@ jobs:
       matrix: "${{ fromJson(needs.gen.outputs.level1) }}"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - run: "make ${{ matrix.target }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
   level2:
     needs: [ "gen", "level1" ]
@@ -65,7 +75,17 @@ jobs:
       matrix: "${{ fromJson(needs.gen.outputs.level2) }}"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - run: "make ${{ matrix.target }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
   level3:
     needs: [ "gen", "level2" ]
@@ -75,7 +95,17 @@ jobs:
       matrix: "${{ fromJson(needs.gen.outputs.level3) }}"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - run: "make ${{ matrix.target }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
   level4:
     needs: [ "gen", "level3" ]
@@ -85,4 +115,14 @@ jobs:
       matrix: "${{ fromJson(needs.gen.outputs.level4) }}"
     steps:
       - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - run: "make ${{ matrix.target }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
