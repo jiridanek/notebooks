@@ -28,22 +28,10 @@ jobs:
         run: |
           df -h
 
-          sudo apt-get -qq purge \
-            build-essential \
-            azure-cli google-cloud-sdk google-cloud-cli \
-            microsoft-edge-stable google-chrome-stable firefox \
-            powershell \
-            '~n^temurin' '~n^openjdk' '~n^dotnet' '~n^mono' '~n^aspnetcore' '~n^gfortran' '~n^cpp' '~n^ghc'
-          sudo apt-get clean
-          sudo apt-get autoremove
-          sudo apt-get autoclean
-
           sudo rm -rf /usr/include &
-          # https://github.com/ros-industrial/industrial_ci/issues/648#issuecomment-805119646
-          sudo rm -rf /usr/local &
-          # sudo rm -rf /usr/local/lib/android &
-          # sudo rm -rf /usr/local/share/boost &
-          # sudo rm -rf /usr/local/lib/node_modules &
+          sudo rm -rf /usr/local/lib/android &
+          sudo rm -rf /usr/local/share/boost &
+          sudo rm -rf /usr/local/lib/node_modules &
           sudo rm -rf /usr/share/dotnet &
           sudo rm -rf /opt/ghc &
           sudo rm -rf /opt/hostedtoolcache/CodeQL &
@@ -54,10 +42,6 @@ jobs:
           wait
 
           df -h
-
-          # tell docker to use the bigger disk
-          #sudo mkdir /mnt/docker
-          #sudo mount --bind /var/lib/docker /mnt/docker
 
       - name: Mount lvm overlay for podman builds
         run: |
@@ -71,7 +55,7 @@ jobs:
 
       # https://github.com/containers/buildah/issues/2521#issuecomment-884779112
       - name: Workaround https://github.com/containers/podman/issues/22152#issuecomment-2027705598
-        run: sudo apt-get remove -y --allow-remove-essential podman crun shim-signed fuse 'libfuse*' fuse-overlayfs
+        run: sudo apt-get remove -y --allow-remove-essential podman crun
 
       - uses: actions/cache@v4
         id: cached-linuxbrew
