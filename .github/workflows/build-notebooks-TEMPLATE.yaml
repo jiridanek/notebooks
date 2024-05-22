@@ -100,3 +100,6 @@ jobs:
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
           CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
+
+      - run: df -h
+        if: "${{ !cancelled() }}"
