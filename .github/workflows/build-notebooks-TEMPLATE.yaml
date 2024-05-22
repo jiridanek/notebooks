@@ -59,15 +59,19 @@ jobs:
         run: sudo apt-get remove -y --allow-remove-essential podman crun shim-signed fuse 'libfuse*' fuse-overlayfs
 
       - uses: actions/cache@v4
+        id: cached-linuxbrew
         with:
           path: /home/linuxbrew/.linuxbrew
           key: linuxbrew
 
       - name: Install podman
+        if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           /home/linuxbrew/.linuxbrew/bin/brew install podman
-          echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
+
+      - name: Add linuxbrew to PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
 
       - run: "make ${{ inputs.target }}"
         env:
