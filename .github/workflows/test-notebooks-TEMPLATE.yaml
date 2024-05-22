@@ -47,6 +47,8 @@ jobs:
       - run: docker run -d --name k0s --hostname k0s --privileged -v /var/lib/k0s -p 6443:6443 --cgroupns=host docker.io/k0sproject/k0s:v1.30.0-k0s.0 -- k0s controller --enable-worker
 
       - run: |
+          mkdir -p $HOME/.kube
+          docker cp k0s:/var/lib/k0s/pki/admin.conf $HOME/.kube/config
           until kubectl wait --for=condition=Ready nodes --all; do
             sleep 7
           done
