@@ -41,7 +41,7 @@ define build_image
 		$(eval BUILD_ARGS := --build-arg BASE_IMAGE=$(BASE_IMAGE_NAME)),
 		$(eval BUILD_ARGS :=)
 	)
-	$(CONTAINER_ENGINE) build --cache-from $(CACHE) --cache-to $(CACHE) --retry 42 -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
+	$(CONTAINER_ENGINE) build --cache-from $(CACHE) --cache-to $(CACHE) -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
 endef
 
 # Push function for the notebok image:
@@ -49,7 +49,7 @@ endef
 define push_image
 	$(eval IMAGE_NAME := $(IMAGE_REGISTRY):$(subst /,-,$(1))-$(IMAGE_TAG))
 	$(info # Pushing $(IMAGE_NAME) image...)
-	$(CONTAINER_ENGINE) push --retry=42 $(IMAGE_NAME)
+	$(CONTAINER_ENGINE) push $(IMAGE_NAME)
 endef
 
 # Build and push the notebook images:
