@@ -1,5 +1,6 @@
 name: Build Notebooks
-permissions: {}
+permissions:
+  packages: write
 on:
   push:
   pull_request:
