@@ -58,7 +58,7 @@ sudo swapon "/dev/mapper/${VG_NAME}-swap"
 
 echo "Creating build volume"
 # create and mount build volume
-sudo lvcreate --type raid0 --stripes 2 --stripesize 4 --extents 100%FREE --name buildlv "${VG_NAME}"
+sudo lvcreate --type raid0 --stripes 2 --stripesize 4 --alloc anywhere --extents 100%FREE --name buildlv "${VG_NAME}"
 if [[ ${overprovision_lvm} == 'true' ]]; then
   sudo mkfs.ext4 -m0 "/dev/mapper/${VG_NAME}-buildlv"
 else
