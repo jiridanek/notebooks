@@ -88,7 +88,7 @@ jobs:
       - name: Add linuxbrew to PATH
         run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
 
-      - name: Workaround for missing pasta binary in linuxbrew
+      - name: Configure Podman
         run: |
           mkdir -p $HOME/.config/containers/
           cp containers.conf $HOME/.config/containers/containers.conf
