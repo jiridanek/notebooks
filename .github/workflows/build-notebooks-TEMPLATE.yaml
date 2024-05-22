@@ -1,0 +1,62 @@
+# inspired by
+# https://github.com/thesuperzapper/kubeflow/blob/master/.github/workflows/example_notebook_servers_publish_TEMPLATE.yaml
+name: Build & Publish Notebook Servers (TEMPLATE)
+on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        description: "make target to build"
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # https://github.com/containers/buildah/issues/2521#issuecomment-884779112
+      - name: Workaround https://github.com/containers/podman/issues/22152#issuecomment-2027705598
+        run: sudo apt-get -qq remove podman crun
+
+      - uses: actions/cache@v4
+        id: cached-linuxbrew
+        with:
+          path: /home/linuxbrew/.linuxbrew
+          key: linuxbrew
+
+      - name: Install podman
+        if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          /home/linuxbrew/.linuxbrew/bin/brew install podman
+
+      - name: Add linuxbrew to PATH
+        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
+
+      - name: Configure Podman
+        run: |
+          mkdir -p $HOME/.config/containers/
+          cp containers.conf $HOME/.config/containers/containers.conf
+          cp storage.conf $HOME/.config/containers/storage.conf
+          # should at least reset storage when touching storage.conf
+          sudo mkdir -p /mnt/containers/
+          sudo chown -R $USER:$USER /mnt/containers
+          podman system reset --force
+          # podman bug? need to create this _after_ doing the reset
+          mkdir -p /mnt/containers/tmp
+
+      - run: "make ${{ inputs.target }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
+          CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
+
+      - run: df -h
+        if: "${{ !cancelled() }}"

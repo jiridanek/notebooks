@@ -41,7 +41,7 @@ define build_image
 		$(eval BUILD_ARGS := --build-arg BASE_IMAGE=$(BASE_IMAGE_NAME)),
 		$(eval BUILD_ARGS :=)
 	)
-	$(CONTAINER_ENGINE) build --no-cache  -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
+	$(CONTAINER_ENGINE) build --cache-from $(CACHE) --cache-to $(CACHE) -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
 endef
 
 # Push function for the notebok image:
