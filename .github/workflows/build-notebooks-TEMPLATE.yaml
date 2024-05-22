@@ -75,6 +75,7 @@ jobs:
       - name: Configure Podman
         run: |
           mkdir -p $HOME/.config/containers/
+          mkdir -p $HOME/.local/share/containers/tmp
           cp containers.conf $HOME/.config/containers/containers.conf
           cp storage.conf $HOME/.config/containers/storage.conf
           # should at least reset storage when touching storage.conf
