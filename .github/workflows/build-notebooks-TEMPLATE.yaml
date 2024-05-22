@@ -55,7 +55,7 @@ jobs:
 
       # https://github.com/containers/buildah/issues/2521#issuecomment-884779112
       - name: Workaround https://github.com/containers/podman/issues/22152#issuecomment-2027705598
-        run: sudo apt-get remove -y --allow-remove-essential podman crun
+        run: sudo apt-get -qq remove podman crun
 
       - uses: actions/cache@v4
         id: cached-linuxbrew
