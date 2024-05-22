@@ -111,7 +111,7 @@ def main() -> None:
 
     output = print_github_actions_matrix(levels)
 
-    print(*output)
+    print(*output, sep="\n")
     with open(os.environ["GITHUB_OUTPUT"], "at") as f:
         for line in output:
             print(line, file=f)
