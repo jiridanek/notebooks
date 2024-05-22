@@ -57,6 +57,9 @@ jobs:
             sleep 7
           done
 
+          # untaint master
+          kubectl taint nodes --all node-role.kubernetes.io/master:NoSchedule-
+
       - run: "make deploy8-${{ inputs.target }}"
         if: "${{ contains(inputs.target, 'python-3.8') }}"
         env:
@@ -70,7 +73,13 @@ jobs:
       - run: |
           kubectl get statefulset -n default
           kubectl describe statefulset -n default
-          sleep 60
+
+          sleep 15
+
+          kubectl describe pod -n default
+
+          sleep 45
+
           kubectl get statefulset -n default
           kubectl describe statefulset -n default
           kubectl describe pod -n default
