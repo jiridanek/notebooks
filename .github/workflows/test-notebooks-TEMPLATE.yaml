@@ -59,9 +59,13 @@ jobs:
 
       - run: "make deploy8-${{ inputs.target }}"
         if: "${{ contains(inputs.target, 'python-3.8') }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
       - run: "make deploy9-${{ inputs.target }}"
         if: "${{ contains(inputs.target, 'python-3.9') }}"
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
       - run: "make test-${{ inputs.target }}"
         env:
