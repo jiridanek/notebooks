@@ -48,3 +48,4 @@ jobs:
       - run: "make ${{ inputs.target }}"
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
+          CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
