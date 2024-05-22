@@ -59,6 +59,16 @@ jobs:
           #sudo mkdir /mnt/docker
           #sudo mount --bind /var/lib/docker /mnt/docker
 
+      - name: Mount lvm overlay for podman builds
+        run: |
+          df -h
+          free -h
+
+          bash gha_lvm_overlay.bash
+
+          df -h
+          free -h
+
       # https://github.com/containers/buildah/issues/2521#issuecomment-884779112
       - name: Workaround https://github.com/containers/podman/issues/22152#issuecomment-2027705598
         run: sudo apt-get remove -y --allow-remove-essential podman crun shim-signed fuse 'libfuse*' fuse-overlayfs
