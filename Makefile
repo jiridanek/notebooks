@@ -49,7 +49,7 @@ endef
 define push_image
 	$(eval IMAGE_NAME := $(IMAGE_REGISTRY):$(subst /,-,$(1))-$(IMAGE_TAG))
 	$(info # Pushing $(IMAGE_NAME) image...)
-	$(CONTAINER_ENGINE) push $(IMAGE_NAME)
+	$(CONTAINER_ENGINE) push --retry=42 $(IMAGE_NAME)
 endef
 
 # Build and push the notebook images:
