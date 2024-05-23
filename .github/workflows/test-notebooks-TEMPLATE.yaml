@@ -67,13 +67,6 @@ jobs:
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
-      - run: |
-          kubectl get statefulset -A
-          kubectl describe statefulset -A
-          sleep 60
-          kubectl get statefulset -A
-          kubectl describe statefulset -A
-
       - run: "make test-${{ inputs.target }}"
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
