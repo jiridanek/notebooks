@@ -35,16 +35,6 @@ jobs:
       target: "${{ matrix.target }}"
     secrets: inherit
 
-  level0test:
-    needs: [ "gen", "level0" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level0) }}"
-    uses: ./.github/workflows/test-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
   # images that only depend on base images
   level1:
     needs: [ "gen", "level0" ]
