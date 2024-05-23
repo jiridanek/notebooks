@@ -2,6 +2,7 @@ import json
 import math
 import os
 import re
+import string
 from typing import Iterable, cast
 
 """Trivial Makefile parser that extracts target dependencies so that we can build each Dockerfile image target in its
@@ -105,9 +106,23 @@ def print_github_actions_matrix(levels: dict[str, int]) -> list[str]:
 def write_github_workflow_file(tree: dict[str, list[str]]) -> None:
     jobs = {}
 
+    # IDs may only contain alphanumeric characters, '_', and '-'. IDs must start with a letter or '_' and must be less than 100 characters.
+    allowed_github_chars = string.ascii_letters + string.digits + "_-"
+
     for task, deps in tree.items():
-        jobs[task] = {
-            "needs": deps,
+        # in level 0, we only want base images, not other utility tasks
+        if not deps:
+            if not task.startswith("base-"):
+                continue
+
+        # we won't build rhel-based images because they need subscription
+        if "rhel" in task:
+            continue
+
+        task_name = re.sub(r"[^-_0-9A-Za-z]", "_", task)
+        deps_names = [re.sub(r"[^-_0-9A-Za-z]", "_", dep) for dep in deps]
+        jobs[task_name] = {
+            "needs": deps_names,
             "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
             "with": {
                 "target": task,
