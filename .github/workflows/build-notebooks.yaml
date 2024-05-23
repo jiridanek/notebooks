@@ -1,77 +1,465 @@
-name: Build Notebooks
-permissions:
-  packages: write
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-
-jobs:
-  gen:
-    name: Generate job matrix
-    runs-on: ubuntu-latest
-    outputs:
-      level0: ${{ steps.gen.outputs.level0 }}
-      level1: ${{ steps.gen.outputs.level1 }}
-      level2: ${{ steps.gen.outputs.level2 }}
-      level3: ${{ steps.gen.outputs.level3 }}
-      level4: ${{ steps.gen.outputs.level4 }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python3.12 gen_gha_matrix_jobs.py
-        id: gen
-
-  # base images
-  level0:
-    needs: [ "gen" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level0) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  # images that only depend on base images
-  level1:
-    needs: [ "gen", "level0" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level1) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  level2:
-    needs: [ "gen", "level1" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level2) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  level3:
-    needs: [ "gen", "level2" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level3) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
-
-  level4:
-    needs: [ "gen", "level3" ]
-    strategy:
-      fail-fast: false
-      matrix: "${{ fromJson(needs.gen.outputs.level4) }}"
-    uses: ./.github/workflows/build-notebooks-TEMPLATE.yaml
-    with:
-      target: "${{ matrix.target }}"
-    secrets: inherit
+{
+    "name": "Build Notebooks",
+    "permissions": {
+        "packages": "write"
+    },
+    "on": {
+        "push": {},
+        "pull_request": {},
+        "workflow_dispatch": {}
+    },
+    "jobs": {
+        "base-ubi8-python-3.8": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "base-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-minimal-ubi8-python-3.8": {
+            "needs": [
+                "base-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-minimal-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-datascience-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-minimal-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-datascience-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-ubi8-python-3.8": {
+            "needs": [
+                "base-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-jupyter-minimal-ubi8-python-3.8": {
+            "needs": [
+                "cuda-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-jupyter-minimal-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-jupyter-datascience-ubi8-python-3.8": {
+            "needs": [
+                "cuda-jupyter-minimal-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-jupyter-datascience-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-trustyai-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-datascience-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-trustyai-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "habana-jupyter-1.9.0-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-datascience-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "habana-jupyter-1.9.0-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "habana-jupyter-1.10.0-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-datascience-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "habana-jupyter-1.10.0-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "habana-jupyter-1.11.0-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-datascience-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "habana-jupyter-1.11.0-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "habana-jupyter-1.13.0-ubi8-python-3.8": {
+            "needs": [
+                "jupyter-datascience-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "habana-jupyter-1.13.0-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-minimal-ubi8-python-3.8": {
+            "needs": [
+                "base-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-minimal-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-datascience-ubi8-python-3.8": {
+            "needs": [
+                "base-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-datascience-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-pytorch-ubi8-python-3.8": {
+            "needs": [
+                "base-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-pytorch-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-cuda-tensorflow-ubi8-python-3.8": {
+            "needs": [
+                "cuda-ubi8-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-cuda-tensorflow-ubi8-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "base-ubi9-python-3.9": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "base-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-minimal-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-minimal-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-datascience-ubi9-python-3.9": {
+            "needs": [
+                "jupyter-minimal-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-datascience-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-jupyter-minimal-ubi9-python-3.9": {
+            "needs": [
+                "cuda-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-jupyter-minimal-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-jupyter-datascience-ubi9-python-3.9": {
+            "needs": [
+                "cuda-jupyter-minimal-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-jupyter-datascience-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-jupyter-tensorflow-ubi9-python-3.9": {
+            "needs": [
+                "cuda-jupyter-datascience-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-jupyter-tensorflow-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-pytorch-ubi9-python-3.9": {
+            "needs": [
+                "cuda-jupyter-datascience-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-pytorch-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-trustyai-ubi9-python-3.9": {
+            "needs": [
+                "jupyter-datascience-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-trustyai-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-minimal-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-minimal-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-datascience-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-datascience-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-pytorch-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-pytorch-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "runtime-cuda-tensorflow-ubi9-python-3.9": {
+            "needs": [
+                "cuda-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "runtime-cuda-tensorflow-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "codeserver-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "codeserver-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "intel-base-gpu-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "intel-base-gpu-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "intel-runtime-tensorflow-ubi9-python-3.9": {
+            "needs": [
+                "intel-base-gpu-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "intel-runtime-tensorflow-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-intel-tensorflow-ubi9-python-3.9": {
+            "needs": [
+                "intel-runtime-tensorflow-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-intel-tensorflow-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "intel-runtime-pytorch-ubi9-python-3.9": {
+            "needs": [
+                "intel-base-gpu-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "intel-runtime-pytorch-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-intel-pytorch-ubi9-python-3.9": {
+            "needs": [
+                "intel-runtime-pytorch-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-intel-pytorch-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "intel-runtime-ml-ubi9-python-3.9": {
+            "needs": [
+                "base-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "intel-runtime-ml-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-intel-ml-ubi9-python-3.9": {
+            "needs": [
+                "intel-runtime-ml-ubi9-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-intel-ml-ubi9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "base-c9s-python-3.9": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "base-c9s-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-c9s-python-3.9": {
+            "needs": [
+                "base-c9s-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-c9s-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "rstudio-c9s-python-3.9": {
+            "needs": [
+                "base-c9s-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "rstudio-c9s-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "cuda-rstudio-c9s-python-3.9": {
+            "needs": [
+                "cuda-c9s-python-3.9"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "cuda-rstudio-c9s-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "base-rhel9-python-3.9": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "base-rhel9-python-3.9"
+            },
+            "secrets": "inherit"
+        },
+        "base-anaconda-python-3.8": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "base-anaconda-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "jupyter-datascience-anaconda-python-3.8": {
+            "needs": [
+                "base-anaconda-python-3.8"
+            ],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "jupyter-datascience-anaconda-python-3.8"
+            },
+            "secrets": "inherit"
+        },
+        "validate-ubi9-datascience": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "validate-ubi9-datascience"
+            },
+            "secrets": "inherit"
+        },
+        "validate-ubi8-datascience": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "validate-ubi8-datascience"
+            },
+            "secrets": "inherit"
+        },
+        "refresh-pipfilelock-files": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "refresh-pipfilelock-files"
+            },
+            "secrets": "inherit"
+        },
+        "scan-image-vulnerabilities": {
+            "needs": [],
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": "scan-image-vulnerabilities"
+            },
+            "secrets": "inherit"
+        }
+    }
+}

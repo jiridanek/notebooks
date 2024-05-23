@@ -102,14 +102,47 @@ def print_github_actions_matrix(levels: dict[str, int]) -> list[str]:
         lines.append(f"level{level}={json.dumps(matrix, separators=(",", ":"))}")
     return lines
 
+def write_github_workflow_file(tree: dict[str, list[str]]) -> None:
+    jobs = {}
+
+    for task, deps in tree.items():
+        jobs[task] = {
+            "needs": deps,
+            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
+            "with": {
+                "target": task,
+            },
+            "secrets": "inherit",
+        }
+
+    workflow = {
+        "name": "Build Notebooks",
+        "permissions": {
+            "packages": "write",
+        },
+        "on": {
+            "push": {},
+            "pull_request": {},
+            "workflow_dispatch": {},
+        },
+        "jobs": jobs,
+    }
+
+    with open(".github/workflows/build-notebooks.yaml", "wt") as f:
+        # every json file is a valid yaml file
+        json.dump(workflow, f, sort_keys=False, indent=4)
+
+
 def main() -> None:
     # https://www.gnu.org/software/make/manual/make.html#Reading-Makefiles
     with open("Makefile", "rt") as makefile:
         lines = read_makefile_lines(makefile)
     tree = extract_target_dependencies(lines)
-    levels = compute_target_distances_from_root(tree)
 
+    levels = compute_target_distances_from_root(tree)
     output = print_github_actions_matrix(levels)
+
+    write_github_workflow_file(tree)
 
     print(*output, sep="\n")
     with open(os.environ["GITHUB_OUTPUT"], "at") as f:
