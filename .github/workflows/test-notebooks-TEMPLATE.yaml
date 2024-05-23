@@ -46,11 +46,6 @@ jobs:
       # https://docs.k0sproject.io/stable/k0s-in-docker/
       - run: docker run -d --name k0s --hostname k0s --privileged -v /var/lib/k0s -p 6443:6443 --cgroupns=host docker.io/k0sproject/k0s:v1.30.0-k0s.0 -- k0s controller --enable-worker
 
-      - run: |
-          until kubectl wait --for=condition=Ready nodes --all; do
-            sleep 7
-          done
-
       - run: "make deploy8-${{ inputs.target }}"
         if: "${{ contains(inputs.target, 'python-3.8') }}"
 
