@@ -88,19 +88,5 @@ jobs:
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
-      - run: |
-          kubectl get statefulset -n default
-          kubectl describe statefulset -n default
-
-          sleep 15
-
-          kubectl describe pod -n default
-
-          sleep 45
-
-          kubectl get statefulset -n default
-          kubectl describe statefulset -n default
-          kubectl describe pod -n default
-
       - run: df -h
         if: "${{ !cancelled() }}"
