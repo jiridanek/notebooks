@@ -1,7 +1,8 @@
 # inspired by
 # https://github.com/thesuperzapper/kubeflow/blob/master/.github/workflows/example_notebook_servers_publish_TEMPLATE.yaml
+---
 name: Build & Publish Notebook Servers (TEMPLATE)
-on:
+"on":
   workflow_call:
     inputs:
       target:
