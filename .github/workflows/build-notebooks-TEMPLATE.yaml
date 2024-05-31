@@ -9,6 +9,10 @@ name: Build & Publish Notebook Servers (TEMPLATE)
         required: true
         description: "make target to build"
         type: string
+      event_name:
+        required: true
+        description: "top workflow's `github.event_name`"
+        type: string
 
 jobs:
   build:
@@ -54,9 +58,18 @@ jobs:
           # podman bug? need to create this _after_ doing the reset
           mkdir -p /mnt/containers/tmp
 
-      - run: "make ${{ inputs.target }}"
+      - run: "push: make ${{ inputs.target }}"
+        if: ${{ inputs.event_name == 'push' }}
         env:
+          IMAGE_TAG: "${{ github.ref_name }}--${{ github.sha }}"
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
+          CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
+
+      - run: "pull_request: make ${{ inputs.target }}"
+        if: ${{ inputs.event_name == 'pull_request' }}
+        env:
+          IMAGE_TAG: "${{ github.ref_name }}--${{ github.sha }}"
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images/pr"
           CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
 
       - run: df -h
