@@ -103,7 +103,7 @@ def write_github_workflow_file(tree: dict[str, list[str]], path: pathlib.Path) -
             "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
             "with": {
                 "target": task,
-                "event_name": "${{ github.event_name }}",
+                "github": "${{ github }}",
             },
             "secrets": "inherit",
         }

@@ -5,13 +5,15 @@ name: Build & Publish Notebook Servers (TEMPLATE)
 "on":
   workflow_call:
     inputs:
+      # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+      # https://docs.github.com/en/actions/learn-github-actions/contexts
       target:
         required: true
         description: "make target to build"
         type: string
-      event_name:
+      github:
         required: true
-        description: "top workflow's `github.event_name`"
+        description: "top workflow's `github`"
         type: string
 
 jobs:
@@ -58,18 +60,22 @@ jobs:
           # podman bug? need to create this _after_ doing the reset
           mkdir -p /mnt/containers/tmp
 
-      - run: "push: make ${{ inputs.target }}"
-        if: ${{ inputs.event_name == 'push' }}
+      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
+      - name: "push: make ${{ inputs.target }}"
+        run: "make ${{ inputs.target }}"
+        if: "${{ fromJson(inputs.github).event_name == 'push' }}"
         env:
           IMAGE_TAG: "${{ github.ref_name }}--${{ github.sha }}"
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
           CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
 
-      - run: "pull_request: make ${{ inputs.target }}"
-        if: ${{ inputs.event_name == 'pull_request' }}
+      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
+      - name: "pull_request: make ${{ inputs.target }}"
+        run: "make ${{ inputs.target }}"
+        if: "${{ fromJson(inputs.github).event_name == 'pull_request' }}"
         env:
           IMAGE_TAG: "${{ github.ref_name }}--${{ github.sha }}"
-          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images/pr"
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images/pr${{ fromJson(inputs.github).event.number }}"
           CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
 
       - run: df -h
