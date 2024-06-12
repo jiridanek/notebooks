@@ -4,10 +4,6 @@
 SCRIPT_DIR=/opt/app-root/bin
 source ${SCRIPT_DIR}/utils/process.sh
 
-if [ -f "${SCRIPT_DIR}/utils/setup-elyra.sh" ]; then
-  source ${SCRIPT_DIR}/utils/setup-elyra.sh
-fi
-
 # Initialize notebooks arguments variable
 NOTEBOOK_PROGRAM_ARGS=""
 

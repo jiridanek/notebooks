@@ -15,8 +15,6 @@ WORKDIR /opt/app-root/bin
 
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY Pipfile.lock ./
-# Copy Elyra setup to utils so that it's sourced at startup
-COPY setup-elyra.sh ./utils/
 
 RUN echo "Installing softwares and packages" && \
     micropipenv install && \

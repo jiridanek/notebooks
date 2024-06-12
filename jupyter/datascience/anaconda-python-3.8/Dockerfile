@@ -26,7 +26,6 @@ COPY utils utils/
 # Install Python packages and Jupyterlab extensions from conda environment file
 COPY environment.yml start-notebook.sh ./
 # Copy Elyra setup to utils so that it's sourced at startup
-#COPY jupyter_elyra_config.py setup-elyra.sh pipeline-flow.svg ./utils/
 
 RUN echo "Installing softwares and packages" && \
     /opt/anaconda3/bin/conda env update -p "${APP_ROOT}" --file environment.yml && \
