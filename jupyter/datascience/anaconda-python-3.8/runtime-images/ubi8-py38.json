@@ -1,10 +1,12 @@
 {
+  "display_name": "Python 3.8 (UBI8)",
+  "metadata": {
+    "tags": [
+      "minimal"
+    ],
     "display_name": "Python 3.8 (UBI8)",
-    "metadata": {
-        "tags": ["minimal"],
-        "display_name": "Python 3.8 (UBI8)",
-        "image_name": "quay.io/opendatahub/workbench-images@sha256:43d2f1c7e68a9b2cdaaedd357c9644b005b3cb6275fe9c199174b513833a1352",
-        "pull_policy": "IfNotPresent"
-    },
-    "schema_name": "runtime-image"
+    "image_name": "quay.io/opendatahub/workbench-images@sha256:98a035d355d67120fc913cf753866d7bad2227af21ccc3894148b4b679d40c3d",
+    "pull_policy": "IfNotPresent"
+  },
+  "schema_name": "runtime-image"
 }

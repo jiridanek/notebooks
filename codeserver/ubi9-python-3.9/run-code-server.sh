@@ -16,55 +16,83 @@ fi
 # Initilize access logs for culling
 echo '[{"id":"code-server","name":"code-server","last_activity":"'$(date -Iseconds)'","execution_state":"running","connections":1}]' > /var/log/nginx/codeserver.access.log
 
-# Directory for settings file
-user_dir="/opt/app-root/src/.local/share/code-server/User/"
+# Add "/opt/app-root/src/.vscode/" directory to set default interpreter also for Run & Debug
+user_dir="/opt/app-root/src/.vscode/"
 settings_filepath="${user_dir}settings.json"
+launch_filepath="${user_dir}launch.json"
+
+json_launch_settings='{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "python": "/opt/app-root/bin/python3"
+        }
+    ]
+}'
 
 json_settings='{
   "python.defaultInterpreterPath": "/opt/app-root/bin/python3"
-}'
+  }'
 
 # Check if User directory exists
 if [ ! -d "$user_dir" ]; then
   echo "Debug: User directory not found, creating '$user_dir'..."
   mkdir -p "$user_dir"
+  echo "$json_launch_settings" > "$launch_filepath"
+  echo "Debug: '$launch_filepath' file created."
   echo "$json_settings" > "$settings_filepath"
   echo "Debug: '$settings_filepath' file created."
 else
   echo "Debug: User directory already exists."
-  # Add settings.json if not present
-  if [ ! -f "$settings_filepath" ]; then
+  # Add settings.json and launch.json if not present
+  if [ ! -f "$launch_filepath" ]; then
+    echo "Debug: '$launch_filepath' file not found, creating..."
+    echo "$json_launch_settings" > "$launch_filepath"
+    echo "Debug: '$launch_filepath' file created."
+  elif [ ! -f "$settings_filepath" ]; then
     echo "Debug: '$settings_filepath' file not found, creating..."
     echo "$json_settings" > "$settings_filepath"
     echo "Debug: '$settings_filepath' file created."
   else
+    echo "Debug: '$launch_filepath' file already exists."
     echo "Debug: '$settings_filepath' file already exists."
+
   fi
 fi
 
-# Check if code-server folder exists
-if [ ! -f "/opt/app-root/src/.local/share/code-server" ]; then
+# Ensure the extensions directory exists
+extensions_dir="/opt/app-root/src/.local/share/code-server/extensions"
+mkdir -p "$extensions_dir"
 
-    # Check internet connection - this check is for disconected enviroments
-    if curl -Is http://www.google.com | head -n 1 | grep -q "200 OK"; then
-        # Internet connection is available
-        echo "Internet connection available. Installing specific extensions."
-
-        # Install specific extensions
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-python.python-2023.14.0.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-2023.3.100.vsix
+# Copy installed extensions to the runtime extensions directory if they do not already exist
+if [ -d "/opt/app-root/extensions-temp" ]; then
+  for extension in /opt/app-root/extensions-temp/*/;
+  do
+    extension_folder=$(basename "$extension")
+    if [ ! -d "$extensions_dir/$extension_folder" ]; then
+      cp -r "$extension" "$extensions_dir"
+      echo "Debug: Extension '$extension_folder' copied to runtime directory."
     else
-        # No internet connection
-        echo "No internet connection. Installing all extensions."
-
-        # Install all extensions
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-python.python-2023.14.0.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-2023.3.100.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-keymap-1.1.2.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-renderers-1.0.17.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.vscode-jupyter-cell-tags-0.1.8.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.vscode-jupyter-slideshow-0.1.5.vsix
+      echo "Debug: Extension '$extension_folder' already exists in runtime directory, skipping."
     fi
+  done
+else
+  echo "Debug: Temporary extensions directory not found."
+fi
+
+# Ensure log directory exists
+logs_dir="/opt/app-root/src/.local/share/code-server/coder-logs"
+if [ ! -d "$logs_dir" ]; then
+  echo "Debug: Log directory not found, creating '$logs_dir'..."
+  mkdir -p "$logs_dir"
 fi
 
 # Start server

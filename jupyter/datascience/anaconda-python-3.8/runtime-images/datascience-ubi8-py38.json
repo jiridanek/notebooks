@@ -1,11 +1,12 @@
 {
+  "display_name": "Datascience with Python 3.8 (UBI8)",
+  "metadata": {
+    "tags": [
+      "datascience"
+    ],
     "display_name": "Datascience with Python 3.8 (UBI8)",
-    "metadata": {
-      "tags": ["datascience"],
-      "display_name": "Datascience with Python 3.8 (UBI8)",
-      "image_name": "quay.io/opendatahub/workbench-images@sha256:8deff8c5109fc18ab38811ec68a514fa10fcc41dd671584b010db2ee9fcd2171",
-      "pull_policy": "IfNotPresent"
-    },
-    "schema_name": "runtime-image"
-  }
-  
+    "image_name": "quay.io/opendatahub/workbench-images@sha256:acc9b8fed84c9778b177581455c0a5d228d1438daa629e1a476cef4440f2a91a",
+    "pull_policy": "IfNotPresent"
+  },
+  "schema_name": "runtime-image"
+}

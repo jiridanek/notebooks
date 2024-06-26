@@ -1,10 +1,18 @@
 approvers:
   - atheo89
   - harshad16
-  - VaishnaviHire
 
 reviewers:
   - atheo89
+  - caponetto
   - dibryant
   - harshad16
+  - jiridanek
+  - jstourac
+  - paulovmr
+
+emeritus_approvers:
+  - VaishnaviHire
+
+emeritus_reviewers:
   - rkpattnaik780
