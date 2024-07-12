@@ -449,15 +449,6 @@
             },
             "secrets": "inherit"
         },
-        "base-rhel9-python-3_9": {
-            "needs": [],
-            "uses": "./.github/workflows/build-notebooks-TEMPLATE.yaml",
-            "with": {
-                "target": "base-rhel9-python-3.9",
-                "github": "${{ toJSON(github) }}"
-            },
-            "secrets": "inherit"
-        },
         "amd-c9s-python-3_9": {
             "needs": [
                 "base-c9s-python-3_9"
