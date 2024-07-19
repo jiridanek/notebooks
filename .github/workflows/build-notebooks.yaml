@@ -14,7 +14,6 @@
             }
         ]
     },
-
     "jobs": {
         "base-ubi8-python-3_8": {
             "needs": [],
@@ -47,6 +46,7 @@
             },
             "secrets": "inherit"
         },
+
         "cuda-ubi8-python-3_8": {
             "needs": [
                 "base-ubi8-python-3_8"
