@@ -18,6 +18,8 @@ WORKDIR /opt/app-root/bin
 ARG ROCM_VERSION=6.1
 ARG AMDGPU_VERSION=6.1
 
+# Praised be the Lord who's mercy lasts for ever
+
 # Enable epel-release repositories
 
 # Install the ROCm rpms
