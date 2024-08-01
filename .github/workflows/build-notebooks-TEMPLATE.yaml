@@ -123,6 +123,8 @@ jobs:
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
           CONTAINER_BUILD_CACHE_ARGS: "--cache-from ${{ env.CACHE }} --cache-to ${{ env.CACHE }}"
+          # dependent images were already built and pushed, so just let podman pull it
+          BUILD_DEPENDENT_IMAGES: "no"
 
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
       - name: "pull_request: make ${{ inputs.target }}"
