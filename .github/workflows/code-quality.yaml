@@ -1,33 +1,97 @@
 ---
 name: Code static analysis
-on: [pull_request]  # yamllint disable-line rule:truthy
+on:  # yamllint disable-line rule:truthy
+  push:
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  check-generated-code:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rerun all code generators we have
+        run: bash ci/generate_code.sh
+
+      - name: Check there aren't any modified files present
+        run: |
+          clean=$(git status --porcelain)
+          if [[ -z "$clean" ]]; then
+              echo "Empty git status --porcelain: $clean"
+          else
+              echo "::error::Please run 'bash ci/generate_code.sh' (the command from the previous step), commit the changed files locally, and push again."
+              echo "Uncommitted file changes detected: $clean"
+              git diff
+              exit 1
+          fi
+
+  pytest-tests:
+    runs-on: ubuntu-latest
+    env:
+      poetry_version: '1.8.3'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache poetry in ~/.local
+        uses: actions/cache/restore@v4
+        id: cache-poetry-restore
+        with:
+          path: ~/.local
+          key: "${{ runner.os }}-local-${{ env.poetry_version }}"
+
+      - name: Install poetry
+        if: steps.cache-poetry-restore.outputs.cache-hit != 'true'
+        run: pip install poetry==${{ env.poetry_version }}
+
+      - name: Save cache
+        if: steps.cache-poetry-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.local
+          key: ${{ steps.cache-poetry-restore.outputs.cache-primary-key }}
+
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - name: Configure poetry
+        run: poetry env use "${{ steps.setup-python.outputs.python-path }}"
+
+      - name: Install deps
+        run: poetry install --sync
+
+      - run: poetry run pytest
+
   code-static-analysis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Validate YAML files (best code practices check included)
         id: validate-yaml-files
-        uses: ibiqlik/action-yamllint@v3.1.1
-        with:
-          config_file: ./ci/yamllint-config.yaml
+        run: |
+          type yamllint || sudo apt-get -y install yamllint
+          find . -name "*.yaml" | xargs yamllint --strict --config-file ./ci/yamllint-config.yaml
+          find . -name "*.yml" | xargs yamllint --strict --config-file ./ci/yamllint-config.yaml
 
       # In some YAML files we use JSON strings, let's check these
       - name: Validate JSON strings in YAML files (just syntax)
         id: validate-json-strings-in-yaml-files
         run: |
-          type json_verify || sudo apt-get install yajl-tools
+          type json_verify || sudo apt-get -y install yajl-tools
           bash ./ci/check-json.sh
 
       - name: Validate JSON files (just syntax)
         id: validate-json-files
         run: |
-          type json_verify || sudo apt-get install yajl-tools
+          type json_verify || sudo apt-get -y install yajl-tools
           shopt -s globstar
           ret_code=0
           echo "-- Checking a regular '*.json' files"
@@ -40,3 +104,28 @@ jobs:
               echo "There were errors in some of the checked files. Please run `json_verify` on such files and fix issues there."
           fi
           exit "${ret_code}"
+
+      - name: Validate Dockerfiles
+        id: validate-dockerfiles
+        run: |
+          type hadolint || sudo apt-get -y install wget \
+                             && wget --output-document=hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
+                             && chmod a+x hadolint
+          echo "Starting Hadolint"
+          find . -name "Dockerfile" | xargs ./hadolint --config ./ci/hadolint-config.yaml
+          echo "Hadolint done"
+
+      # This simply checks that the manifests and respective kustomization.yaml finishes without an error.
+      - name: Check kustomize manifest
+        id: kustomize-manifests
+        run: |
+          kubectl version --client=true
+          echo "----------------------------------------------------------"
+          echo "Starting 'kubectl kustomize manifests/base'"
+          echo "----------------------------------------------------------"
+          kubectl kustomize manifests/base
+
+          echo "----------------------------------------------------------"
+          echo "Starting 'kubectl kustomize manifests/overlays/additional'"
+          echo "----------------------------------------------------------"
+          kubectl kustomize manifests/overlays/additional

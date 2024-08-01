@@ -1,7 +1,21 @@
-CONTAINER_ENGINE ?= podman
 IMAGE_REGISTRY   ?= quay.io/opendatahub/workbench-images
-RELEASE	 		 ?= 2023b
-DATE 			 ?= $(shell date +'%Y%m%d')
+RELEASE	 		 ?= 2024a
+# additional user-specified caching parameters for $(CONTAINER_ENGINE) build
+CONTAINER_BUILD_CACHE_ARGS ?= --no-cache
+# whether to build all dependent images or just the one specified
+BUILD_DEPENDENT_IMAGES ?= yes
+# whether to push the images to a registry as they are built
+PUSH_IMAGES ?= yes
+
+# OS dependant: Generate date, select appropriate cmd to locate container engine
+ifeq ($(OS), Windows_NT)
+	DATE 		?= $(shell powershell -Command "Get-Date -Format 'yyyyMMdd'")
+	WHERE_WHICH ?= where
+else
+	DATE 		?= $(shell date +'%Y%m%d')
+	WHERE_WHICH ?= which
+endif
+
 IMAGE_TAG		 ?= $(RELEASE)_$(DATE)
 KUBECTL_BIN      ?= bin/kubectl
 KUBECTL_VERSION  ?= v1.23.11
@@ -10,6 +24,16 @@ REQUIRED_RUNTIME_IMAGE_COMMANDS="curl python3"
 REQUIRED_CODE_SERVER_IMAGE_COMMANDS="curl python oc code-server"
 REQUIRED_R_STUDIO_IMAGE_COMMANDS="curl python oc /usr/lib/rstudio-server/bin/rserver"
 
+# Detect and select the system's available container engine
+ifeq (, $(shell $(WHERE_WHICH) podman))
+	DOCKER := $(shell $(WHERE_WHICH) docker)
+	ifeq (, $(DOCKER))
+		$(error "Neither Docker nor Podman is installed. Please install one of them.")
+	endif
+	CONTAINER_ENGINE := docker
+else
+	CONTAINER_ENGINE := podman
+endif
 
 # Build function for the notebok image:
 #   ARG 1: Image tag name.
@@ -23,7 +47,7 @@ define build_image
 		$(eval BUILD_ARGS := --build-arg BASE_IMAGE=$(BASE_IMAGE_NAME)),
 		$(eval BUILD_ARGS :=)
 	)
-	$(CONTAINER_ENGINE) build --no-cache  -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
+	$(CONTAINER_ENGINE) build $(CONTAINER_BUILD_CACHE_ARGS)  -t $(IMAGE_NAME) $(BUILD_ARGS)  $(2)
 endef
 
 # Push function for the notebok image:
@@ -38,9 +62,19 @@ endef
 #   ARG 1: Image tag name.
 #   ARG 2: Path of image context we want to build.
 #   ARG 3: Base image tag name (optional).
+#
+# BUILD_DEPENDENT_IMAGES: only build images that were explicitly given given as a goal on commandline
+# PUSH_IMAGES: allows skipping podman push
 define image
-	$(call build_image,$(1),$(2),$(3))
-	$(call push_image,$(1))
+	$(info #*# Image build directory: <$(2)> #(MACHINE-PARSED LINE)#*#...)
+
+	$(if $(or $(BUILD_DEPENDENT_IMAGES:no=), $(filter $@,$(MAKECMDGOALS))),
+		$(call build_image,$(1),$(2),$(3))
+
+		$(if $(PUSH_IMAGES:no=),
+			$(call push_image,$(1))
+		)
+	)
 endef
 
 ####################################### Buildchain for Python 3.8 using ubi8 #######################################
@@ -76,25 +110,15 @@ cuda-jupyter-minimal-ubi8-python-3.8: cuda-ubi8-python-3.8
 cuda-jupyter-datascience-ubi8-python-3.8: cuda-jupyter-minimal-ubi8-python-3.8
 	$(call image,$@,jupyter/datascience/ubi8-python-3.8,$<)
 
-# Build and push jupyter-trustyai-ubi8-python-3.8 image to the registry
-.PHONY: jupyter-trustyai-ubi8-python-3.8
-jupyter-trustyai-ubi8-python-3.8: jupyter-datascience-ubi8-python-3.8
-	$(call image,$@,jupyter/trustyai/ubi8-python-3.8,$<)
-
-# Build and push habana-jupyter-1.9.0-ubi8-python-3.8 image to the registry
-.PHONY: habana-jupyter-1.9.0-ubi8-python-3.8
-habana-jupyter-1.9.0-ubi8-python-3.8: jupyter-datascience-ubi8-python-3.8
-	$(call image,$@,habana/1.9.0/ubi8-python-3.8,$<)
-
 # Build and push habana-jupyter-1.10.0-ubi8-python-3.8 image to the registry
 .PHONY: habana-jupyter-1.10.0-ubi8-python-3.8
 habana-jupyter-1.10.0-ubi8-python-3.8: jupyter-datascience-ubi8-python-3.8
 	$(call image,$@,habana/1.10.0/ubi8-python-3.8,$<)
 
-# Build and push habana-jupyter-1.11.0-ubi8-python-3.8 image to the registry
-.PHONY: habana-jupyter-1.11.0-ubi8-python-3.8
-habana-jupyter-1.11.0-ubi8-python-3.8: jupyter-datascience-ubi8-python-3.8
-	$(call image,$@,habana/1.11.0/ubi8-python-3.8,$<)
+# Build and push habana-jupyter-1.13.0-ubi8-python-3.8 image to the registry
+.PHONY: habana-jupyter-1.13.0-ubi8-python-3.8
+habana-jupyter-1.13.0-ubi8-python-3.8: jupyter-datascience-ubi8-python-3.8
+	$(call image,$@,habana/1.13.0/ubi8-python-3.8,$<)
 
 # Build and push runtime-minimal-ubi8-python-3.8 image to the registry
 .PHONY: runtime-minimal-ubi8-python-3.8
@@ -187,6 +211,40 @@ runtime-cuda-tensorflow-ubi9-python-3.9: cuda-ubi9-python-3.9
 codeserver-ubi9-python-3.9: base-ubi9-python-3.9
 	$(call image,$@,codeserver/ubi9-python-3.9,$<)
 
+# Build and push base-anaconda-python-3.9-intel-gpu image to the registry
+.PHONY: intel-base-gpu-ubi9-python-3.9
+intel-base-gpu-ubi9-python-3.9: base-ubi9-python-3.9
+	$(call image,$@,intel/base/gpu/ubi9-python-3.9,$<)
+
+# Build and push intel-runtime-tensorflow-ubi9-python-3.9 image to the registry
+.PHONY: intel-runtime-tensorflow-ubi9-python-3.9
+intel-runtime-tensorflow-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
+	$(call image,$@,intel/runtimes/tensorflow/ubi9-python-3.9,$<)
+
+# Build and push jupyter-intel-tensorflow-ubi9-python-3.9 image to the registry
+.PHONY: jupyter-intel-tensorflow-ubi9-python-3.9
+jupyter-intel-tensorflow-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
+	$(call image,$@,jupyter/intel/tensorflow/ubi9-python-3.9,$<)
+
+# Build and push intel-runtime-pytorch-ubi9-python-3.9 image to the registry
+.PHONY: intel-runtime-pytorch-ubi9-python-3.9
+intel-runtime-pytorch-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
+	$(call image,$@,intel/runtimes/pytorch/ubi9-python-3.9,$<)
+
+# Build and push jupyter-intel-pytorch-ubi9-python-3.9 image to the registry
+.PHONY: jupyter-intel-pytorch-ubi9-python-3.9
+jupyter-intel-pytorch-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
+	$(call image,$@,jupyter/intel/pytorch/ubi9-python-3.9,$<)
+
+# Build and push intel-runtime-ml-ubi9-python-3.9 image to the registry
+.PHONY: intel-runtime-ml-ubi9-python-3.9
+intel-runtime-ml-ubi9-python-3.9: base-ubi9-python-3.9
+	$(call image,$@,intel/runtimes/ml/ubi9-python-3.9,$<)
+
+# Build and push jupyter-intel-ml-ubi9-python-3.9 image to the registry
+.PHONY: jupyter-intel-ml-ubi9-python-3.9
+jupyter-intel-ml-ubi9-python-3.9: base-ubi9-python-3.9
+	$(call image,$@,jupyter/intel/ml/ubi9-python-3.9,$<)
 
 ####################################### Buildchain for Python 3.9 using C9S #######################################
 
@@ -206,6 +264,41 @@ rstudio-c9s-python-3.9: base-c9s-python-3.9
 .PHONY: cuda-rstudio-c9s-python-3.9
 cuda-rstudio-c9s-python-3.9: cuda-c9s-python-3.9
 	$(call image,$@,rstudio/c9s-python-3.9,$<)
+
+####################################### Buildchain for AMD Python 3.9 using UBI9 #######################################
+.PHONY: rocm-ubi9-python-3.9
+rocm-ubi9-python-3.9: base-ubi9-python-3.9
+	$(call image,$@,rocm/ubi9-python-3.9,$<)
+
+# We are only using rocm-ubi9 base image here onwards
+.PHONY: rocm-jupyter-minimal-ubi9-python-3.9
+rocm-jupyter-minimal-ubi9-python-3.9: rocm-ubi9-python-3.9
+	$(call image,$@,jupyter/minimal/ubi9-python-3.9,$<)
+
+# Build and push rocm-jupyter-datascience-ubi9-python-3.9 image to the registry
+.PHONY: rocm-jupyter-datascience-ubi9-python-3.9
+rocm-jupyter-datascience-ubi9-python-3.9: rocm-jupyter-minimal-ubi9-python-3.9
+	$(call image,$@,jupyter/datascience/ubi9-python-3.9,$<)
+
+# Build and push rocm-jupyter-tensorflow-ubi9-python-3.9 image to the registry
+.PHONY: rocm-jupyter-tensorflow-ubi9-python-3.9
+rocm-jupyter-tensorflow-ubi9-python-3.9: rocm-jupyter-datascience-ubi9-python-3.9
+	$(call image,$@,jupyter/rocm/tensorflow/ubi9-python-3.9,$<)
+
+# Build and push rocm-jupyter-pytorch-ubi9-python-3.9 image to the registry
+.PHONY: rocm-jupyter-pytorch-ubi9-python-3.9
+rocm-jupyter-pytorch-ubi9-python-3.9: rocm-jupyter-datascience-ubi9-python-3.9
+	$(call image,$@,jupyter/rocm/pytorch/ubi9-python-3.9,$<)
+
+# Build and push rocm-jupyter-runtime-pytorch-ubi9-python-3.9 image to the registry
+.PHONY: rocm-runtime-pytorch-ubi9-python-3.9
+rocm-runtime-pytorch-ubi9-python-3.9: rocm-ubi9-python-3.9
+	$(call image,$@,runtimes/rocm-pytorch/ubi9-python-3.9,$<)
+
+# Build and push rocm-jupyter-runtime-tensorflow-ubi9-python-3.9 image to the registry
+.PHONY: rocm-runtime-tensorflow-ubi9-python-3.9
+rocm-runtime-tensorflow-ubi9-python-3.9: rocm-ubi9-python-3.9
+	$(call image,$@,runtimes/rocm-tensorflow/ubi9-python-3.9,$<)
 
 ####################################### Buildchain for Anaconda Python #######################################
 
@@ -308,16 +401,17 @@ undeploy-c9s-%-c9s-python-3.9: bin/kubectl
 #   ARG 1: UBI flavor
 #   ARG 1: Python kernel
 define test_with_papermill
+	$(eval PREFIX_NAME := $(subst /,-,$(1)_$(2))) \
 	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "python3 -m pip install papermill" ; \
-	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "wget ${NOTEBOOK_REPO_BRANCH_BASE}/jupyter/$(1)/$(2)-$(3)/test/test_notebook.ipynb -O test_notebook.ipynb && python3 -m papermill test_notebook.ipynb $(1)_$(2)_output.ipynb --kernel python3 --stderr-file $(1)_$(2)_error.txt" ; \
+	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "wget ${NOTEBOOK_REPO_BRANCH_BASE}/jupyter/$(1)/$(2)-$(3)/test/test_notebook.ipynb -O test_notebook.ipynb && python3 -m papermill test_notebook.ipynb $(PREFIX_NAME)_output.ipynb --kernel python3 --stderr-file $(PREFIX_NAME)_error.txt" ; \
     if [ $$? -ne 0 ]; then \
-		echo "ERROR: The $(1) $(2) notebook encountered a failure. To investigate the issue, you can review the logs located in the ocp-ci cluster on 'artifacts/notebooks-e2e-tests/jupyter-$(1)-$(2)-$(3)-test-e2e' directory or run 'cat $(1)_$(2)_error.txt' within your container. The make process has been aborted." ; \
+		echo "ERROR: The $(1) $(2) notebook encountered a failure. To investigate the issue, you can review the logs located in the ocp-ci cluster on 'artifacts/notebooks-e2e-tests/jupyter-$(1)-$(2)-$(3)-test-e2e' directory or run 'cat $(PREFIX_NAME)_error.txt' within your container. The make process has been aborted." ; \
 		exit 1 ; \
 	fi ; \
-	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "cat $(1)_$(2)_error.txt | grep --quiet FAILED" ; \
+	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "cat $(PREFIX_NAME)_error.txt | grep --quiet FAILED" ; \
 	if [ $$? -eq 0 ]; then \
 		echo "ERROR: The $(1) $(2) notebook encountered a failure. The make process has been aborted." ; \
-		$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "cat $(1)_$(2)_error.txt" ; \
+		$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "cat $(PREFIX_NAME)_error.txt" ; \
 		exit 1 ; \
 	fi
 endef
@@ -325,7 +419,6 @@ endef
 # Verify the notebook's readiness by pinging the /api endpoint and executing the corresponding test_notebook.ipynb file in accordance with the build chain logic.
 .PHONY: test
 test-%: bin/kubectl
-
 	# Verify the notebook's readiness by pinging the /api endpoint
 	$(eval NOTEBOOK_NAME := $(subst .,-,$(subst cuda-,,$*)))
 	$(info # Running tests for $(NOTEBOOK_NAME) notebook...)
@@ -336,6 +429,10 @@ test-%: bin/kubectl
 	# Tests notebook's functionalities 
 	if echo "$(FULL_NOTEBOOK_NAME)" | grep -q "minimal-ubi9"; then \
 		$(call test_with_papermill,minimal,ubi9,python-3.9) \
+	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "intel-tensorflow-ubi9"; then \
+		$(call test_with_papermill,intel/tensorflow,ubi9,python-3.9) \
+	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "intel-pytorch-ubi9"; then \
+		$(call test_with_papermill,intel/pytorch,ubi9,python-3.9) \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "datascience-ubi9"; then \
 		$(MAKE) validate-ubi9-datascience -e FULL_NOTEBOOK_NAME=$(FULL_NOTEBOOK_NAME); \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "pytorch-ubi9"; then \
@@ -344,16 +441,14 @@ test-%: bin/kubectl
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "tensorflow-ubi9"; then \
 		$(MAKE) validate-ubi9-datascience -e FULL_NOTEBOOK_NAME=$(FULL_NOTEBOOK_NAME); \
 		$(call test_with_papermill,tensorflow,ubi9,python-3.9) \
+	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "intel-ml-ubi9"; then \
+		$(call test_with_papermill,intel/ml,ubi9,python-3.9) \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "trustyai-ubi9"; then \
-		$(MAKE) validate-ubi9-datascience -e FULL_NOTEBOOK_NAME=$(FULL_NOTEBOOK_NAME); \
 		$(call test_with_papermill,trustyai,ubi9,python-3.9) \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "minimal-ubi8"; then \
 		$(call test_with_papermill,minimal,ubi8,python-3.8) \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "datascience-ubi8"; then \
 		$(MAKE) validate-ubi8-datascience -e FULL_NOTEBOOK_NAME=$(FULL_NOTEBOOK_NAME); \
-	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "trustyai-ubi8"; then \
-		$(MAKE) validate-ubi8-datascience -e FULL_NOTEBOOK_NAME=$(FULL_NOTEBOOK_NAME); \
-		$(call test_with_papermill,trustyai,ubi8,python-3.8) \
 	elif echo "$(FULL_NOTEBOOK_NAME)" | grep -q "anaconda"; then \
 		echo "There is no test notebook implemented yet for Anaconda Notebook...." \
 	else \
@@ -476,21 +571,28 @@ validate-rstudio-image: bin/kubectl
 refresh-pipfilelock-files:
 	cd base/ubi8-python-3.8 && pipenv lock
 	cd base/ubi9-python-3.9 && pipenv lock
+	cd base/c9s-python-3.9 && pipenv lock
 	cd jupyter/minimal/ubi8-python-3.8 && pipenv lock
 	cd jupyter/minimal/ubi9-python-3.9 && pipenv lock
 	cd jupyter/datascience/ubi8-python-3.8 && pipenv lock
 	cd jupyter/datascience/ubi9-python-3.9 && pipenv lock
 	cd jupyter/pytorch/ubi9-python-3.9 && pipenv lock
 	cd jupyter/tensorflow/ubi9-python-3.9 && pipenv lock
-	cd jupyter/trustyai/ubi8-python-3.8 && pipenv lock
 	cd jupyter/trustyai/ubi9-python-3.9 && pipenv lock
+	cd habana/1.10.0/ubi8-python-3.8 && pipenv lock
+	cd habana/1.13.0/ubi8-python-3.8 && pipenv lock
+	cd runtimes/minimal/ubi8-python-3.8 && pipenv lock
+	cd runtimes/minimal/ubi9-python-3.9 && pipenv lock
 	cd runtimes/datascience/ubi8-python-3.8 && pipenv lock
 	cd runtimes/datascience/ubi9-python-3.9 && pipenv lock
 	cd runtimes/pytorch/ubi9-python-3.9 && pipenv lock
 	cd runtimes/pytorch/ubi8-python-3.8 && pipenv lock
 	cd runtimes/tensorflow/ubi8-python-3.8 && pipenv lock
 	cd runtimes/tensorflow/ubi9-python-3.9 && pipenv lock
-	cd base/c9s-python-3.9 && pipenv lock
+	cd runtimes/rocm-tensorflow/ubi9-python-3.9 && pipenv lock
+	cd runtimes/rocm-pytorch/ubi9-python-3.9 && pipenv lock
+
+
 	
 # This is only for the workflow action
 # For running manually, set the required environment variables

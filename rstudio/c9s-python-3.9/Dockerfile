@@ -13,7 +13,7 @@ LABEL name="odh-notebook-rstudio-server-c9s-python-3.9" \
 
 USER 0
 
-ENV R_VERSION=4.3.1
+ENV R_VERSION=4.3.3
 
 # Install R
 RUN yum install -y yum-utils && \
@@ -31,15 +31,15 @@ RUN chmod -R a+w /usr/lib64/R/library
 ENV LIBLOC /usr/lib64/R/library
 
 # set User R Library path
-RUN mkdir -p /opt/app-root/src/Rpackages/4.3 && chmod -R a+w /opt/app-root/src/Rpackages/4.3
-ENV R_LIBS_USER /opt/app-root/src/Rpackages/4.3
+RUN mkdir -p /opt/app-root/bin/Rpackages/4.3 && chmod -R a+w /opt/app-root/bin/Rpackages/4.3
+ENV R_LIBS_USER /opt/app-root/bin/Rpackages/4.3
 
 WORKDIR /tmp/
 
 # Install RStudio
-RUN wget https://download2.rstudio.org/server/rhel9/x86_64/rstudio-server-rhel-2023.06.1-524-x86_64.rpm && \
-    yum install -y rstudio-server-rhel-2023.06.1-524-x86_64.rpm && \
-    rm rstudio-server-rhel-2023.06.1-524-x86_64.rpm && \
+RUN wget --progress=dot:giga https://download2.rstudio.org/server/rhel9/x86_64/rstudio-server-rhel-2023.12.1-402-x86_64.rpm && \
+    yum install -y rstudio-server-rhel-2023.12.1-402-x86_64.rpm && \
+    rm rstudio-server-rhel-2023.12.1-402-x86_64.rpm && \
     yum -y clean all  --enablerepo='*'
 
 # Specific RStudio config and fixes
@@ -48,12 +48,21 @@ RUN chmod 1777 /var/run/rstudio-server && \
 COPY rsession.conf /etc/rstudio/rsession.conf
 
 # package installation 
-RUN dnf install -y libsodium-devel.x86_64 libgit2-devel.x86_64 libcurl-devel harfbuzz-devel.x86_64 fribidi-devel.x86_64 cmake "flexiblas-*"
-RUN R -e "install.packages('Rcpp')"
+RUN dnf install -y libsodium-devel.x86_64 libgit2-devel.x86_64 libcurl-devel harfbuzz-devel.x86_64 fribidi-devel.x86_64 cmake "flexiblas-*" \
+    && dnf clean all && rm -rf /var/cache/yum
+# Install R packages
+RUN R -e "install.packages('remotes')"
+RUN R -e "require('remotes'); \
+    remotes::install_version('Rcpp','1.0.12'); \
+    remotes::install_version('tidyverse','2.0.0'); \
+    remotes::install_version('tidymodels','1.1.1'); \
+    remotes::install_version('plumber','1.2.1'); \
+    remotes::install_version('vetiver','0.2.5'); \
+    remotes::install_version('devtools','2.4.5');"
 
-# Install NGINX to proxy RStudio and pass probes check 
-ENV NGINX_VERSION=1.22 \
-    NGINX_SHORT_VER=122 \
+# Install NGINX to proxy RStudio and pass probes check
+ENV NGINX_VERSION=1.24 \
+    NGINX_SHORT_VER=124 \
     NGINX_CONFIGURATION_PATH=${APP_ROOT}/etc/nginx.d \
     NGINX_CONF_PATH=/etc/nginx/nginx.conf \
     NGINX_DEFAULT_CONF_PATH=${APP_ROOT}/etc/nginx.default.d \
@@ -64,13 +73,13 @@ ENV NGINX_VERSION=1.22 \
 
 # Modules does not exist
 RUN yum -y module enable nginx:$NGINX_VERSION && \
-    INSTALL_PKGS="nss_wrapper bind-utils gettext hostname nginx nginx-mod-stream nginx-mod-http-perl fcgiwrap initscripts chkconfig" && \
+    INSTALL_PKGS="nss_wrapper bind-utils gettext hostname nginx nginx-mod-stream nginx-mod-http-perl fcgiwrap initscripts chkconfig supervisor" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     nginx -v 2>&1 | grep -qe "nginx/$NGINX_VERSION\." && echo "Found VERSION $NGINX_VERSION" && \
-    # spawn-fcgi is not in epel9
-    rpm -i --nodocs https://www.rpmfind.net/linux/fedora/linux/releases/37/Everything/x86_64/os/Packages/s/spawn-fcgi-1.6.3-23.fc37.x86_64.rpm && \
     yum -y clean all --enablerepo='*'
+
+COPY --chown=1001:0 supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy extra files to the image.
 COPY nginx/root/ /
@@ -118,4 +127,4 @@ WORKDIR /opt/app-root/src
 
 USER 1001
 
-CMD /opt/app-root/bin/run-rstudio.sh
+CMD ["/opt/app-root/bin/run-rstudio.sh"]

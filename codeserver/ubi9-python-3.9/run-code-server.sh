@@ -4,67 +4,102 @@
 SCRIPT_DIR=$(dirname -- "$0")
 source ${SCRIPT_DIR}/utils/*.sh
 
-# Start nginx and fastcgiwrap
+# Start nginx and supervisord
 run-nginx.sh &
-spawn-fcgi -s /var/run/fcgiwrap.socket -M 766 /usr/sbin/fcgiwrap 
+/usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf &
 
 # Add .bashrc for custom promt if not present
 if [ ! -f "/opt/app-root/src/.bashrc" ]; then
   echo 'PS1="\[\033[34;1m\][\$(pwd)]\[\033[0m\]\n\[\033[1;0m\]$ \[\033[0m\]"' > /opt/app-root/src/.bashrc
 fi
 
-# Initilize access logs for culling
+# Initialize access logs for culling
 echo '[{"id":"code-server","name":"code-server","last_activity":"'$(date -Iseconds)'","execution_state":"running","connections":1}]' > /var/log/nginx/codeserver.access.log
 
-# Directory for settings file
-user_dir="/opt/app-root/src/.local/share/code-server/User/"
-settings_filepath="${user_dir}settings.json"
+# Function to create directories and files if they do not exist
+create_dir_and_file() {
+  local dir=$1
+  local filepath=$2
+  local content=$3
 
+  if [ ! -d "$dir" ]; then
+    echo "Debug: Directory not found, creating '$dir'..."
+    mkdir -p "$dir"
+    echo "$content" > "$filepath"
+    echo "Debug: '$filepath' file created."
+  else
+    echo "Debug: Directory already exists."
+    if [ ! -f "$filepath" ]; then
+      echo "Debug: '$filepath' file not found, creating..."
+      echo "$content" > "$filepath"
+      echo "Debug: '$filepath' file created."
+    else
+      echo "Debug: '$filepath' file already exists."
+    fi
+  fi
+}
+
+# Define universal settings
+universal_dir="/opt/app-root/src/.local/share/code-server/User/"
+user_settings_filepath="${universal_dir}settings.json"
+universal_json_settings='{
+  "python.defaultInterpreterPath": "/opt/app-root/bin/python3",
+  "telemetry.telemetryLevel": "off",
+  "telemetry.enableTelemetry": false,
+  "workbench.enableExperiments": false
+}'
+
+# Define python debuger settings
+vscode_dir="/opt/app-root/src/.vscode/"
+settings_filepath="${vscode_dir}settings.json"
+launch_filepath="${vscode_dir}launch.json"
+json_launch_settings='{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python Debugger: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "python": "/opt/app-root/bin/python3"
+    }
+  ]
+}'
 json_settings='{
   "python.defaultInterpreterPath": "/opt/app-root/bin/python3"
 }'
 
-# Check if User directory exists
-if [ ! -d "$user_dir" ]; then
-  echo "Debug: User directory not found, creating '$user_dir'..."
-  mkdir -p "$user_dir"
-  echo "$json_settings" > "$settings_filepath"
-  echo "Debug: '$settings_filepath' file created."
+# Create necessary directories and files for python debuger and universal settings
+create_dir_and_file "$universal_dir" "$user_settings_filepath" "$universal_json_settings"
+create_dir_and_file "$vscode_dir" "$settings_filepath" "$json_settings"
+create_dir_and_file "$vscode_dir" "$launch_filepath" "$json_launch_settings"
+
+# Ensure the extensions directory exists
+extensions_dir="/opt/app-root/src/.local/share/code-server/extensions"
+mkdir -p "$extensions_dir"
+
+# Copy installed extensions to the runtime extensions directory if they do not already exist
+if [ -d "/opt/app-root/extensions-temp" ]; then
+  for extension in /opt/app-root/extensions-temp/*/;
+  do
+    extension_folder=$(basename "$extension")
+    if [ ! -d "$extensions_dir/$extension_folder" ]; then
+      cp -r "$extension" "$extensions_dir"
+      echo "Debug: Extension '$extension_folder' copied to runtime directory."
+    else
+      echo "Debug: Extension '$extension_folder' already exists in runtime directory, skipping."
+    fi
+  done
 else
-  echo "Debug: User directory already exists."
-  # Add settings.json if not present
-  if [ ! -f "$settings_filepath" ]; then
-    echo "Debug: '$settings_filepath' file not found, creating..."
-    echo "$json_settings" > "$settings_filepath"
-    echo "Debug: '$settings_filepath' file created."
-  else
-    echo "Debug: '$settings_filepath' file already exists."
-  fi
+  echo "Debug: Temporary extensions directory not found."
 fi
 
-# Check if code-server folder exists
-if [ ! -f "/opt/app-root/src/.local/share/code-server" ]; then
-
-    # Check internet connection - this check is for disconected enviroments
-    if curl -Is http://www.google.com | head -n 1 | grep -q "200 OK"; then
-        # Internet connection is available
-        echo "Internet connection available. Installing specific extensions."
-
-        # Install specific extensions
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-python.python-2023.14.0.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-2023.3.100.vsix
-    else
-        # No internet connection
-        echo "No internet connection. Installing all extensions."
-
-        # Install all extensions
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-python.python-2023.14.0.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-2023.3.100.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-keymap-1.1.2.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.jupyter-renderers-1.0.17.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.vscode-jupyter-cell-tags-0.1.8.vsix
-        code-server --install-extension ${SCRIPT_DIR}/utils/ms-toolsai.vscode-jupyter-slideshow-0.1.5.vsix
-    fi
+# Ensure log directory exists
+logs_dir="/opt/app-root/src/.local/share/code-server/coder-logs"
+if [ ! -d "$logs_dir" ]; then
+  echo "Debug: Log directory not found, creating '$logs_dir'..."
+  mkdir -p "$logs_dir"
 fi
 
 # Start server

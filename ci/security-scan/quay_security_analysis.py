@@ -20,9 +20,9 @@ IMAGES_MAIN = [
     "odh-tensorflow-gpu-notebook-image-main",
     "odh-trustyai-notebook-image-main",
     "odh-habana-notebook-image-main",
-    "odh-codeserver-notebook-main",
-    "odh-rstudio-notebook-main",
-    "odh-rstudio-gpu-notebook-main"
+    "odh-codeserver-notebook-image-main",
+    "odh-rstudio-notebook-image-main",
+    "odh-rstudio-gpu-notebook-image-main"
 ]
 
 IMAGES = [
@@ -37,9 +37,9 @@ IMAGES = [
     "odh-runtime-tensorflow-notebook-image-n",
     "odh-trustyai-notebook-image-n",
     "odh-habana-notebook-image-n",
-    "odh-codeserver-notebook-n",
-    "odh-rstudio-notebook-n",
-    "odh-rstudio-gpu-notebook-n"
+    "odh-codeserver-notebook-image-n",
+    "odh-rstudio-notebook-image-n",
+    "odh-rstudio-gpu-notebook-image-n"
 ]
 
 IMAGES_N_1 = [
@@ -53,9 +53,9 @@ IMAGES_N_1 = [
     "odh-tensorflow-gpu-notebook-image-n-1",
     "odh-runtime-tensorflow-notebook-image-n-1",
     "odh-trustyai-notebook-image-n-1",
-    "odh-codeserver-notebook-n-1",
-    "odh-rstudio-notebook-n-1",
-    "odh-rstudio-gpu-notebook-n-1"
+    "odh-codeserver-notebook-image-n-1",
+    "odh-rstudio-notebook-image-n-1",
+    "odh-rstudio-gpu-notebook-image-n-1"
 ]
 
 def generate_markdown_table(branch_dictionary):
@@ -81,9 +81,9 @@ def process_image(image, commit_id_path, RELEASE_VERSION_N, HASH_N):
     regex = ""
 
     if RELEASE_VERSION_N == "":
-        regex = f"{src_tag}-(\\d+-)?{HASH_N}"
+        regex = f"^{src_tag}-(\\d+-)?{HASH_N}$"
     else:
-        regex = f"{src_tag}-{RELEASE_VERSION_N}-\\d+-{HASH_N}"
+        regex = f"^{src_tag}-{RELEASE_VERSION_N}-\\d+-{HASH_N}$"
 
     latest_tag_cmd = f'skopeo inspect docker://{img} | jq -r --arg regex "{regex}" \'.RepoTags | map(select(. | test($regex))) | .[0]\''
     latest_tag = subprocess.check_output(latest_tag_cmd, shell=True, text=True).strip()
