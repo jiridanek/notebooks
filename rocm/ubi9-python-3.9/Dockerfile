@@ -38,7 +38,7 @@ RUN echo "[ROCm]" > /etc/yum.repos.d/rocm.repo && \
 # Install more of the supporting libs
 RUN yum install -y \
       hipblas hiprand hipsparse hipblaslt hipblaslt-devel && \
-    yum clean all && rm -rf /var/cache/yum \
+    yum clean all && rm -rf /var/cache/yum
 
 RUN yum install -y \
       hipfft hipsolver miopen-hip roctracer rocrand && \
