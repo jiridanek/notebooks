@@ -32,9 +32,16 @@ RUN echo "[ROCm]" > /etc/yum.repos.d/rocm.repo && \
     echo "baseurl=https://repo.radeon.com/amdgpu/$AMDGPU_VERSION/rhel/9.4/main/x86_64" >> /etc/yum.repos.d/amdgpu.repo && \
     echo "enabled=1" >> /etc/yum.repos.d/amdgpu.repo && \
     echo "gpgcheck=0" >> /etc/yum.repos.d/amdgpu.repo && \
-    yum install --nodocs --setopt=install_weak_deps=False -y \
-      rocm-smi hipblas hiprand hipsparse \
-      hipblaslt hipblaslt-devel hipfft hipsolver miopen-hip roctracer rccl rocrand && \
+    yum install -y \
+      rocm-smi rccl && \
+    yum clean all && rm -rf /var/cache/yum
+# Install more of the supporting libs
+RUN yum install -y \
+      hipblas hiprand hipsparse hipblaslt hipblaslt-devel && \
+    yum clean all && rm -rf /var/cache/yum \
+
+RUN yum install -y \
+      hipfft hipsolver miopen-hip roctracer rocrand && \
     yum clean all && rm -rf /var/cache/yum
 # Install the rest of the ROCm RPMs; this way we avoid creating a single huge
 #  layer, that would stress OpenShift CI infrastructure too much
