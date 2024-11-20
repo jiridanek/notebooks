@@ -28,7 +28,7 @@ def main() -> None:
 
     if "GITHUB_ACTIONS" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "at") as f:
-            json.dump({"tests": has_tests}, fp=f)
+            print(f"tests={json.dumps(has_tests)}", file=f)
 
     print(f"{has_tests=}")
 
