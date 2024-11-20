@@ -142,6 +142,13 @@ jobs:
       - name: "Show podman images information"
         run: podman images --digests
 
+      - name: "Install KinD to run Makefile tests"
+        uses: helm/kind-action@v1
+        with:
+          install_only: true
+      - name: "Create cluster"
+        run: kind create cluster --config=ci/cached-builds/kind.yaml
+
       - name: "pull_request|schedule: resolve target if Trivy scan should run"
         id: resolve-target
         if: ${{ fromJson(inputs.github).event_name == 'pull_request' || fromJson(inputs.github).event_name == 'schedule' }}
