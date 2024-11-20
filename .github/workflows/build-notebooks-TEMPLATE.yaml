@@ -202,7 +202,7 @@ jobs:
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
       - name: "Show crio images information"
-        run: crictl images
+        run: sudo crictl images
           
 
 
