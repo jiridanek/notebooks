@@ -154,7 +154,7 @@ jobs:
 
       # https://cri-o.io/
       - name: Install cri-o
-        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
+        if: ${{ steps.have-tests.outputs.tests == 'true' }}
         run: |
           set -Eeuxo pipefail
 
