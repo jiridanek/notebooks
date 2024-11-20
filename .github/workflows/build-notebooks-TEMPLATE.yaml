@@ -114,6 +114,9 @@ jobs:
           sysctl -w net.ipv4.ip_forward=1
           
           kubeadm init
+        env:
+          CRIO_VERSION: v1.30
+          KUBERNETES_VERSION: v1.30
 
       - name: Install k3s
         run: |
