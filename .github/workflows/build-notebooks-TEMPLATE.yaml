@@ -157,7 +157,14 @@ jobs:
         run: kind create cluster --config=ci/cached-builds/kind.yaml
 
       - name: "Check that we got the images we expect in KinD"
-        run: docker exec kind-control-plane crictl images
+        run: |
+          set -Eeuxo pipefail
+          docker exec kind-control-plane crictl images
+          ls $HOME/.local/share/containers
+          ls $HOME/.local/share/containers/storage
+          docker exec kind-control-plane ls /var/run/containers
+          docker exec kind-control-plane ls /var/run/containers/storage
+          
 
 
 #        env:
