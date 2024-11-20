@@ -22,10 +22,10 @@ def main() -> None:
 
     has_tests = False
     dirs = gha_pr_changed_files.analyze_build_directories(args.target)
-    for d in dirs:
+    for d in reversed(dirs):  # (!)
         kustomization = pathlib.Path(d) / "kustomize/base/kustomization.yaml"
         has_tests = has_tests or kustomization.is_file()
-        break  # TODO: check only the first directory (the top level layer) for now
+        break  # TODO: check only the last directory (the top level layer) for now
 
     if "GITHUB_ACTIONS" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "at") as f:
