@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
 import argparse
 import json
 import os
 import pathlib
-import sys
 import typing
 
 import gha_pr_changed_files
