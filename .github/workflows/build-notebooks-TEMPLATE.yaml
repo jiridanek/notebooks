@@ -86,6 +86,42 @@ jobs:
           path: /home/linuxbrew/.linuxbrew
           key: linuxbrew
 
+      # https://cri-o.io/
+      - name: Install cri-o
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common curl
+          
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/Release.key |
+            sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          
+          echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/ /" |
+            sudo tee /etc/apt/sources.list.d/kubernetes.list
+          
+          curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key |
+            sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+  
+          echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/ /" |
+            sudo tee /etc/apt/sources.list.d/cri-o.list
+          
+          sudo apt-get update
+          sudo apt-get install -y cri-o kubelet kubeadm kubectl
+          
+          systemctl start crio.service
+
+          swapoff -a
+          modprobe br_netfilter
+          sysctl -w net.ipv4.ip_forward=1
+          
+          kubeadm init
+
+      - name: Install k3s
+        run: |
+          sudo ufw disable
+          curl -sfL https://get.k3s.io | sh -
+        env:
+          INSTALL_K3S_EXEC: "--container-runtime-endpoint /var/run/crio/crio.sock --no-deploy servicelb --no-deploy traefik"
+
       - name: Install podman
         if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
