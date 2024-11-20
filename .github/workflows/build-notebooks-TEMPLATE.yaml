@@ -117,6 +117,7 @@ jobs:
           sudo modprobe br_netfilter
           sudo sysctl -w net.ipv4.ip_forward=1
           
+          # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --cri-socket=/var/run/crio/crio.sock
           
           mkdir -p $HOME/.kube
@@ -126,8 +127,11 @@ jobs:
           CRIO_VERSION: v1.30
           KUBERNETES_VERSION: v1.30
 
+      - name: Untaint
+        run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
       - name: Install pod network
-        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/$FLANNEL_VERSION/download/kube-flannel.yml
+        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/tag/$FLANNEL_VERSION/download/kube-flannel.yml
         env:
           FLANNEL_VERSION: v0.26.1
 
