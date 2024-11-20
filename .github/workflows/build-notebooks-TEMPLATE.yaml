@@ -186,6 +186,8 @@ jobs:
       - name: Install Kubernetes cluster
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
+          set -Eeuxo pipefail
+
           sudo swapoff -a
           sudo modprobe br_netfilter
           sudo sysctl -w net.ipv4.ip_forward=1
@@ -196,6 +198,19 @@ jobs:
           mkdir -p $HOME/.kube
           sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
           sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+      - name: Show debug data (on failure)
+        if: ${{ failure() }}
+        run: |
+          set -Eeuxo pipefail
+
+          sudo systemctl status kubelet
+          sudo journalctl -xeu kubelet
+          
+          # Here is one example how you may list all running Kubernetes containers by using crictl:
+          sudo crictl --runtime-endpoint unix:///var/run/crio/crio.sock ps -a | grep kube | grep -v pause
+          # Once you have found the failing container, you can inspect its logs with:
+          # crictl --runtime-endpoint unix:///var/run/crio/crio.sock logs CONTAINERID
 
       - name: Untaint the master
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
