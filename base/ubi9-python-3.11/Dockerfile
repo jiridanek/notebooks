@@ -1,3 +1,6 @@
+
+
+
 FROM registry.access.redhat.com/ubi9/python-311:latest
 
 LABEL name="odh-notebook-base-ubi9-python-3.11" \
