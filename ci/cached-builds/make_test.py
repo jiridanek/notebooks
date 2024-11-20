@@ -2,6 +2,7 @@
 import argparse
 import functools
 import subprocess
+import sys
 import typing
 
 """Runs the make commands used to deploy, test, and undeploy image in Kubernetes"""
@@ -37,8 +38,10 @@ def main() -> None:
 @functools.wraps(subprocess.check_call)
 def check_call(*args, **kwargs) -> int:
     print(f"[INFO] Running command {args, kwargs}")
+    sys.stdout.flush()
     result = subprocess.check_call(*args, **kwargs)
     print(f"\tDONE running command {args, kwargs}")
+    sys.stdout.flush()
     return result
 
 
