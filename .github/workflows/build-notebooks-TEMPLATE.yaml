@@ -227,6 +227,11 @@ jobs:
         run: |
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=300s
 
+      - name: Show nodes status
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
+        run: |
+          kubectl describe nodes
+
       - name: "Show crio images information"
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: sudo crictl images
