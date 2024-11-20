@@ -28,9 +28,14 @@ def main() -> None:
     check_call(f"kubectl create namespace {namespace}", shell=True)
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
 
-    check_call(f"make {deploy}-{args.target}", shell=True)
-    check_call(f"make test-{args.target}", shell=True)
-    check_call(f"make un{deploy}-{args.target}", shell=True)
+    try:
+        check_call(f"make {deploy}-{args.target}", shell=True)
+        check_call(f"make test-{args.target}", shell=True)
+        check_call(f"make un{deploy}-{args.target}", shell=True)
+    finally:
+        call(f"kubectl get statefulsets", shell=True)
+        call(f"kubectl get pods", shell=True)
+        call(f"kubectl describe pods", shell=True)
 
     print(f"[INFO] Finished testing {args.target}")
 
@@ -40,6 +45,15 @@ def check_call(*args, **kwargs) -> int:
     print(f"[INFO] Running command {args, kwargs}")
     sys.stdout.flush()
     result = subprocess.check_call(*args, **kwargs)
+    print(f"\tDONE running command {args, kwargs}")
+    sys.stdout.flush()
+    return result
+
+@functools.wraps(subprocess.call)
+def call(*args, **kwargs) -> int:
+    print(f"[INFO] Running command {args, kwargs}")
+    sys.stdout.flush()
+    result = subprocess.call(*args, **kwargs)
     print(f"\tDONE running command {args, kwargs}")
     sys.stdout.flush()
     return result
