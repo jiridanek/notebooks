@@ -137,7 +137,7 @@ jobs:
 
       - name: Want for pods to be running
         run: |
-          kubectl wait pods --all-namespaces --for=condition=Ready --timeout=100s
+          kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
       - name: Install k3s
         run: |
