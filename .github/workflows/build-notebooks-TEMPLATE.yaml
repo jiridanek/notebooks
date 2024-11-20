@@ -174,7 +174,12 @@ jobs:
           sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
           
           sudo systemctl start crio.service
+        env:
+          CRIO_VERSION: v1.30
+          KUBERNETES_VERSION: v1.30
 
+      - name: Install Kubernetes cluster
+        run: |
           sudo swapoff -a
           sudo modprobe br_netfilter
           sudo sysctl -w net.ipv4.ip_forward=1
@@ -185,11 +190,8 @@ jobs:
           mkdir -p $HOME/.kube
           sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
           sudo chown $(id -u):$(id -g) $HOME/.kube/config
-        env:
-          CRIO_VERSION: v1.30
-          KUBERNETES_VERSION: v1.30
 
-      - name: Untaint
+      - name: Untaint the master
         run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
       - name: Install pod network
@@ -197,90 +199,17 @@ jobs:
         env:
           FLANNEL_VERSION: v0.26.1
 
-      - name: Want for pods to be running
+      - name: Wait for pods to be running
         run: |
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=300s
 
       - name: "Show crio images information"
         run: sudo crictl images
-          
 
-
-#        env:
-#          KIND_EXPERIMENTAL_PROVIDER: podman
-      #
-      #      - name: "pull_request|schedule: resolve target if Trivy scan should run"
-#        id: resolve-target
-#        if: ${{ fromJson(inputs.github).event_name == 'pull_request' || fromJson(inputs.github).event_name == 'schedule' }}
-#        env:
-#          EVENT_NAME: ${{ fromJson(inputs.github).event_name }}
-#          HAS_TRIVY_LABEL: ${{ contains(fromJson(inputs.github).event.pull_request.labels.*.name, 'trivy-scan') }}
-#          FS_SCAN_FOLDER: ${{ fromJson(env.TRIVY_SCAN_FS_JSON)[inputs.target] }}
-#        run: |
-#          if [[ "$EVENT_NAME" == "pull_request" && "$HAS_TRIVY_LABEL" == "true" ]]; then
-#            if [[ -n "$FS_SCAN_FOLDER" ]]; then
-#              TARGET="$FS_SCAN_FOLDER"
-#              TYPE="fs"
-#            else
-#              TARGET="localhost:5000/workbench-images:${{ inputs.target }}-${{ github.sha }}"
-#              TYPE="image"
-#            fi
-#          elif [[ "$EVENT_NAME" == "schedule" ]]; then
-#            if [[ -n "$FS_SCAN_FOLDER" ]]; then
-#              TARGET="$FS_SCAN_FOLDER"
-#              TYPE="fs"
-#            else
-#              TARGET="ghcr.io/${{ github.repository }}/workbench-images:${{ inputs.target }}-${{ github.ref_name }}_${{ github.sha }}"
-#              TYPE="image"
-#            fi
-#          fi
-#
-#          if [[ -n "$TARGET" ]]; then
-#            echo "target=$TARGET" >> $GITHUB_OUTPUT
-#            echo "type=$TYPE" >> $GITHUB_OUTPUT
-#            echo "Trivy scan will run on $TARGET ($TYPE)"
-#          else
-#            echo "Trivy scan won't run"
-#          fi
-#
-#      - name: Run Trivy vulnerability scanner
-#        if: ${{ steps.resolve-target.outputs.target }}
-#        run: |
-#          TRIVY_VERSION=0.53.0
-#          REPORT_FOLDER=${{ github.workspace }}/report
-#          REPORT_FILE=trivy-report.md
-#          REPORT_TEMPLATE=trivy-markdown.tpl
-#
-#          mkdir -p $REPORT_FOLDER
-#          cp ci/$REPORT_TEMPLATE $REPORT_FOLDER
-#
-#          SCAN_TARGET=${{ steps.resolve-target.outputs.target }}
-#          SCAN_TYPE=${{ steps.resolve-target.outputs.type }}
-#          echo "Scanning $SCAN_TARGET ($SCAN_TYPE)"
-#
-#          if [[ "$SCAN_TYPE" == "image" ]]; then
-#            SCAN_ARGS="--image-src podman --podman-host /var/run/podman/podman.sock"
-#            PODMAN_ARGS="-v ${PODMAN_SOCK}:/var/run/podman/podman.sock"
-#          elif [[ "$SCAN_TYPE" == "fs" ]]; then
-#            WORKSPACE_FOLDER="/workspace"
-#            SCAN_TARGET="$WORKSPACE_FOLDER/$SCAN_TARGET"
-#            PODMAN_ARGS="-v ${{ github.workspace }}:$WORKSPACE_FOLDER"
-#          fi
-#
-#          # have trivy access podman socket,
-#          # https://github.com/aquasecurity/trivy/issues/580#issuecomment-666423279
-#          podman run --rm \
-#              $PODMAN_ARGS \
-#              -v ${REPORT_FOLDER}:/report \
-#              docker.io/aquasec/trivy:$TRIVY_VERSION \
-#                $SCAN_TYPE \
-#                $SCAN_ARGS \
-#                --scanners vuln --ignore-unfixed \
-#                --exit-code 0 --timeout 30m \
-#                --format template --template "@/report/$REPORT_TEMPLATE" -o /report/$REPORT_FILE \
-#                $SCAN_TARGET
-#
-#          cat $REPORT_FOLDER/$REPORT_FILE >> $GITHUB_STEP_SUMMARY
+      - name: "Run image tests"
+        run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
+        env:
+          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
 
       - run: df -h
         if: "${{ !cancelled() }}"
