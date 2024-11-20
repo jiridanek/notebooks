@@ -109,13 +109,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cri-o kubelet kubeadm kubectl
           
-          systemctl start crio.service
-
-          swapoff -a
-          modprobe br_netfilter
-          sysctl -w net.ipv4.ip_forward=1
+          sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
           
-          kubeadm init
+          sudo systemctl start crio.service
+
+          sudo swapoff -a
+          sudo modprobe br_netfilter
+          sudo sysctl -w net.ipv4.ip_forward=1
+          
+          sudo kubeadm init
         env:
           CRIO_VERSION: v1.30
           KUBERNETES_VERSION: v1.30
