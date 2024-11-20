@@ -148,8 +148,13 @@ jobs:
       - name: "Show podman images information"
         run: podman images --digests
 
+      - name: "Check if we have tests or not"
+        id: have-tests
+        run: ci/cached-builds/has_tests.py --target ${{ inputs.target }}"
+
       # https://cri-o.io/
       - name: Install cri-o
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           set -Eeuxo pipefail
 
@@ -179,6 +184,7 @@ jobs:
           KUBERNETES_VERSION: v1.30
 
       - name: Install Kubernetes cluster
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           sudo swapoff -a
           sudo modprobe br_netfilter
@@ -192,21 +198,26 @@ jobs:
           sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
       - name: Untaint the master
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
       - name: Install pod network
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: kubectl apply -f https://github.com/flannel-io/flannel/releases/download/$FLANNEL_VERSION/kube-flannel.yml
         env:
           FLANNEL_VERSION: v0.26.1
 
       - name: Wait for pods to be running
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=300s
 
       - name: "Show crio images information"
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: sudo crictl images
 
       - name: "Run image tests"
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
         env:
           IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
