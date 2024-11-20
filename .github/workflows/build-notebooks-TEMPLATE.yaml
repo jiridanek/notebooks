@@ -204,7 +204,7 @@ jobs:
         run: |
           set -Eeuxo pipefail
 
-          sudo systemctl status kubelet
+          sudo systemctl status kubelet || true
           sudo journalctl -xeu kubelet
           
           # Here is one example how you may list all running Kubernetes containers by using crictl:
