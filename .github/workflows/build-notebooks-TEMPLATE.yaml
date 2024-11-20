@@ -108,6 +108,7 @@ jobs:
 
           # configure for rootless KinD
           # https://kind.sigs.k8s.io/docs/user/rootless/
+          sudo mkdir -p /etc/systemd/system/user@.service.d
           sudo cp ci/cached-builds/delegate.conf /etc/systemd/system/user@.service.d/delegate.conf
           sudo systemctl daemon-reload
 
