@@ -148,7 +148,7 @@ jobs:
           install_only: true
 
       - name: "Create cluster with podman"
-        run: kind create cluster --config=ci/cached-builds/kind.yaml
+        run: sudo kind create cluster --config=ci/cached-builds/kind.yaml
         env:
           KIND_EXPERIMENTAL_PROVIDER: podman
       #
