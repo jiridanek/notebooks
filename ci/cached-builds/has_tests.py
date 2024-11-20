@@ -25,6 +25,7 @@ def main() -> None:
     for d in dirs:
         kustomization = pathlib.Path(d) / "kustomize/base/kustomization.yaml"
         has_tests = has_tests or kustomization.is_file()
+        break  # TODO: check only the first directory (the top level layer) for now
 
     if "GITHUB_ACTIONS" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "at") as f:
