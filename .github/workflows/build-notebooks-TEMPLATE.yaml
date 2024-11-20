@@ -155,7 +155,7 @@ jobs:
 
       - name: "Create cluster with podman"
         run: kind create cluster --config=ci/cached-builds/kind.yaml
-        env:
+#        env:
 #          KIND_EXPERIMENTAL_PROVIDER: podman
       #
       #      - name: "pull_request|schedule: resolve target if Trivy scan should run"
