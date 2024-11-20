@@ -131,7 +131,7 @@ jobs:
         run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
       - name: Install pod network
-        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/tag/$FLANNEL_VERSION/download/kube-flannel.yml
+        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/$FLANNEL_VERSION/v0.26.1/kube-flannel.yml
         env:
           FLANNEL_VERSION: v0.26.1
 
