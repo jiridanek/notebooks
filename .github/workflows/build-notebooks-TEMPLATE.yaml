@@ -201,7 +201,8 @@ jobs:
       - name: "Show podman images information"
         run: podman images --digests
 
-
+      - name: "Show crio images information"
+        run: crictl images
           
 
 
