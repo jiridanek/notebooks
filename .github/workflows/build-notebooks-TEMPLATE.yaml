@@ -86,59 +86,6 @@ jobs:
           path: /home/linuxbrew/.linuxbrew
           key: linuxbrew
 
-      # https://cri-o.io/
-      - name: Install cri-o
-        run: |
-          set -Eeuxo pipefail
-
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common curl
-
-          curl -fsSL https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/Release.key | \
-            sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-          echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/ /" | \
-            sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-          curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key | \
-            sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
-
-          echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/ /" | \
-            sudo tee /etc/apt/sources.list.d/cri-o.list
-
-          sudo apt-get update
-          sudo apt-get install -y cri-o kubelet kubeadm kubectl
-          
-          sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
-          
-          sudo systemctl start crio.service
-
-          sudo swapoff -a
-          sudo modprobe br_netfilter
-          sudo sysctl -w net.ipv4.ip_forward=1
-          
-          # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
-          sudo kubeadm init --cri-socket=/var/run/crio/crio.sock
-          
-          mkdir -p $HOME/.kube
-          sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-          sudo chown $(id -u):$(id -g) $HOME/.kube/config
-        env:
-          CRIO_VERSION: v1.30
-          KUBERNETES_VERSION: v1.30
-
-      - name: Untaint
-        run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-
-      - name: Install pod network
-        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/download/$FLANNEL_VERSION/kube-flannel.yml
-        env:
-          FLANNEL_VERSION: v0.26.1
-
-      - name: Want for pods to be running
-        run: |
-          kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
-
       - name: Install podman
         if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
@@ -200,6 +147,59 @@ jobs:
 
       - name: "Show podman images information"
         run: podman images --digests
+
+      # https://cri-o.io/
+      - name: Install cri-o
+        run: |
+          set -Eeuxo pipefail
+
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common curl
+
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/Release.key | \
+            sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+          echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$KUBERNETES_VERSION/deb/ /" | \
+            sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+          curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/Release.key | \
+            sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+
+          echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/$CRIO_VERSION/deb/ /" | \
+            sudo tee /etc/apt/sources.list.d/cri-o.list
+
+          sudo apt-get update
+          sudo apt-get install -y cri-o kubelet kubeadm kubectl
+          
+          sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
+          
+          sudo systemctl start crio.service
+
+          sudo swapoff -a
+          sudo modprobe br_netfilter
+          sudo sysctl -w net.ipv4.ip_forward=1
+          
+          # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
+          sudo kubeadm init --cri-socket=/var/run/crio/crio.sock
+          
+          mkdir -p $HOME/.kube
+          sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+          sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        env:
+          CRIO_VERSION: v1.30
+          KUBERNETES_VERSION: v1.30
+
+      - name: Untaint
+        run: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
+      - name: Install pod network
+        run: kubectl apply -f https://github.com/flannel-io/flannel/releases/download/$FLANNEL_VERSION/kube-flannel.yml
+        env:
+          FLANNEL_VERSION: v0.26.1
+
+      - name: Want for pods to be running
+        run: |
+          kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
       - name: "Show crio images information"
         run: crictl images
