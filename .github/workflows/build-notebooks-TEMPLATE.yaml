@@ -139,13 +139,6 @@ jobs:
         run: |
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
-      - name: Install k3s
-        run: |
-          sudo ufw disable
-          curl -sfL https://get.k3s.io | sh -
-        env:
-          INSTALL_K3S_EXEC: "--container-runtime-endpoint /var/run/crio/crio.sock --no-deploy servicelb --no-deploy traefik"
-
       - name: Install podman
         if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
@@ -208,22 +201,7 @@ jobs:
       - name: "Show podman images information"
         run: podman images --digests
 
-      - name: "Install KinD to run Makefile tests"
-        uses: helm/kind-action@v1
-        with:
-          install_only: true
 
-      - name: "Create cluster with podman"
-        run: kind create cluster --config=ci/cached-builds/kind.yaml
-
-      - name: "Check that we got the images we expect in KinD"
-        run: |
-          set -Eeuxo pipefail
-          docker exec kind-control-plane crictl images
-          ls $HOME/.local/share/containers
-          ls $HOME/.local/share/containers/storage
-          docker exec kind-control-plane ls /var/run/containers
-          docker exec kind-control-plane ls /var/run/containers/storage
           
 
 
