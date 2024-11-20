@@ -146,10 +146,13 @@ jobs:
         uses: helm/kind-action@v1
         with:
           install_only: true
-      - name: "Create cluster"
+
+      - name: "Create cluster with podman"
         run: kind create cluster --config=ci/cached-builds/kind.yaml
-#
-#      - name: "pull_request|schedule: resolve target if Trivy scan should run"
+        env:
+          KIND_EXPERIMENTAL_PROVIDER: podman
+      #
+      #      - name: "pull_request|schedule: resolve target if Trivy scan should run"
 #        id: resolve-target
 #        if: ${{ fromJson(inputs.github).event_name == 'pull_request' || fromJson(inputs.github).event_name == 'schedule' }}
 #        env:
