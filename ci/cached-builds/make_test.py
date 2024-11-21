@@ -23,7 +23,7 @@ def main() -> None:
     else:
         deploy = "deploy9"
 
-    namespace = "ns-" + args.target.translate(str.maketrans("", "", "."))
+    namespace = "ns-" + args.target.translate(str.maketrans(".", "-"))
 
     check_call(f"kubectl create namespace {namespace}", shell=True)
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
