@@ -29,6 +29,9 @@ jobs:
 
     steps:
 
+      - run: env
+      - run: ip addr ls
+
       - uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
