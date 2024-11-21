@@ -254,6 +254,8 @@ jobs:
 
           # this can fail if webhook is not yet ready to answer, retry is needed
           timeout 60s bash -c 'until kubectl create -f ci/cached-builds/kyverno.yaml; do sleep 1; done'
+          # wait for policy to be in effect
+          kubectl wait --for=condition=Ready clusterpolicy --all
 
       - name: Show debug data (on failure)
         if: ${{ failure() }}
