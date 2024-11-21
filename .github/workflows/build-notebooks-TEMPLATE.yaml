@@ -245,6 +245,8 @@ jobs:
       - name: Install Kyverno
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
+          set -Eeuxo pipefail
+
           kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.1/install.yaml
           kubectl wait deployment --all --namespace kyverno --for=condition=Available --timeout=100s
           kubectl create -f ci/cached-builds/kyverno.yaml
