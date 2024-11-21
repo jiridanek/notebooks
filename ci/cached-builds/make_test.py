@@ -38,6 +38,10 @@ def main() -> None:
         call(f"kubectl get pods", shell=True)
         call(f"kubectl describe pods", shell=True)
 
+        call(f"kubectl get events", shell=True)
+        call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1) --previous", shell=True)
+        call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1)", shell=True)
+
     print(f"[INFO] Finished testing {args.target}")
 
 
