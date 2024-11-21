@@ -20,6 +20,8 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     env:
+      # We don't push here when building PRs, so we can use the same IMAGE_REGISTRY in all branches of the workflow
+      IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
       # GitHub image registry used for storing $(CONTAINER_ENGINE)'s cache
       CACHE: "ghcr.io/${{ github.repository }}/workbench-images/build-cache"
       # Targets (and their folder) that should be scanned using FS instead of IMAGE scan due to resource constraints
@@ -120,15 +122,22 @@ jobs:
           systemctl --user start homebrew.podman.service
           echo "PODMAN_SOCK=/run/user/${UID}/podman/podman.sock" >> $GITHUB_ENV
 
-      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
-      - name: "push|schedule: make ${{ inputs.target }}"
+      - name: Calculate image name and tag
+        id: calculated_vars
         run: |
           SANITIZED_REF_NAME=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/_/g')
           export IMAGE_TAG="${SANITIZED_REF_NAME}_${{ github.sha }}"
+          
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+
+      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
+      - name: "push|schedule: make ${{ inputs.target }}"
+        run: |
+          
           make ${{ inputs.target }}
         if: ${{ fromJson(inputs.github).event_name == 'push' || fromJson(inputs.github).event_name == 'schedule' }}
         env:
-          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
+          IMAGE_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
           CONTAINER_BUILD_CACHE_ARGS: "--cache-from ${{ env.CACHE }} --cache-to ${{ env.CACHE }}"
           # dependent images were already built and pushed, so just let podman pull it
           BUILD_DEPENDENT_IMAGES: "no"
@@ -139,8 +148,7 @@ jobs:
           make ${{ inputs.target }}
         if: "${{ fromJson(inputs.github).event_name == 'pull_request' }}"
         env:
-          IMAGE_TAG: "${{ github.sha }}"
-          IMAGE_REGISTRY: "localhost:5000/workbench-images"
+          IMAGE_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
           CONTAINER_BUILD_CACHE_ARGS: "--cache-from ${{ env.CACHE }}"
           # We don't have access to image registry, so disable pushing
           PUSH_IMAGES: "no"
@@ -241,7 +249,6 @@ jobs:
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
         env:
-          IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
-
+          IMAGE_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
       - run: df -h
         if: "${{ !cancelled() }}"
