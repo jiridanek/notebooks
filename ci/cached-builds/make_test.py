@@ -34,6 +34,7 @@ def main() -> None:
         check_call(f"make un{deploy}-{args.target}", shell=True)
     finally:
         call(f"kubectl get statefulsets", shell=True)
+        call(f"kubectl describe statefulsets", shell=True)
         call(f"kubectl get pods", shell=True)
         call(f"kubectl describe pods", shell=True)
 
