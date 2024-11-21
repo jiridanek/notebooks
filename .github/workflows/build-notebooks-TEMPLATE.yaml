@@ -163,6 +163,8 @@ jobs:
         id: have-tests
         run: "ci/cached-builds/has_tests.py --target ${{ inputs.target }}"
 
+      - run: ip addr ls
+
       # https://cri-o.io/
       - name: Install cri-o
         if: ${{ steps.have-tests.outputs.tests == 'true' }}
