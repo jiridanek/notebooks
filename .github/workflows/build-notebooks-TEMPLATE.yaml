@@ -231,7 +231,7 @@ jobs:
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           kubectl describe nodes
-          kubectl wait --for=condition=Ready nodes --all --timeout=100s || kubectl describe nodes && false
+          kubectl wait --for=condition=Ready nodes --all --timeout=100s || (kubectl describe nodes && false)
 
       - name: "Show crio images information"
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
