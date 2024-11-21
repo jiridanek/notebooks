@@ -251,7 +251,9 @@ jobs:
 
           kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.1/install.yaml
           kubectl wait deployment --all --namespace kyverno --for=condition=Available --timeout=100s
-          kubectl create -f ci/cached-builds/kyverno.yaml
+
+          # this can fail if webhook is not yet ready to answer, retry is needed
+          timeout 60s bash -c 'until kubectl create -f ci/cached-builds/kyverno.yaml; do sleep 1; done'
 
       - name: Show debug data (on failure)
         if: ${{ failure() }}
