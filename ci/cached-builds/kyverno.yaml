@@ -35,7 +35,7 @@ spec:
         # https://kyverno.io/docs/writing-policies/jmespath/#random
         - name: randomuid
           variable:
-            jmesPath: to_number(random('[1-9][0-9]{6}'))
+            jmesPath: to_number(random('[1-9][0-9]{4}'))
       mutate:
         patchStrategicMerge:
           spec:
