@@ -38,6 +38,7 @@ def main() -> None:
         call(f"kubectl describe statefulsets", shell=True)
         call(f"kubectl get pods", shell=True)
         call(f"kubectl describe pods", shell=True)
+        call(f"kubectl get pods -o yaml", shell=True)
 
         call(f"kubectl get events", shell=True)
         call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1) --previous", shell=True)
