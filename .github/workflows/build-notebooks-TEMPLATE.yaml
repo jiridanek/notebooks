@@ -94,8 +94,6 @@ jobs:
       - name: Install podman
 #        if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
-          set -x
-          sudo apt-get update
           sudo apt-get install -y podman
 #          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 #          /home/linuxbrew/.linuxbrew/bin/brew install podman
