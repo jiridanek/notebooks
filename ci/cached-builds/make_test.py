@@ -44,6 +44,9 @@ def main() -> None:
         call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1) --previous", shell=True)
         call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1)", shell=True)
 
+        # Print logs from the kyverno webhook, it should mutate our pod
+        call("kubectl logs --namespace kyverno deployment/kyverno-admission-controller", shell=True)
+
     print(f"[INFO] Finished testing {args.target}")
 
 
