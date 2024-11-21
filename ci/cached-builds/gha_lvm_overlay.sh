@@ -64,6 +64,7 @@ if [[ ${overprovision_lvm} == 'true' ]]; then
 else
   sudo mkfs.ext4 -Enodiscard -m0 "/dev/mapper/${VG_NAME}-buildlv"
 fi
+mkdir -p "${build_mount_path}"
 sudo mount "/dev/mapper/${VG_NAME}-buildlv" "${build_mount_path}"
 sudo chown -R "${build_mount_path_ownership}" "${build_mount_path}"
 
