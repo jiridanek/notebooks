@@ -192,6 +192,8 @@ jobs:
           
           sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
           sudo rm -rf /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+          # this is where cri-o gets its storage defaults (that can be overriden in crio.conf.d/
+          sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
           
           sudo systemctl start crio.service
         env:
