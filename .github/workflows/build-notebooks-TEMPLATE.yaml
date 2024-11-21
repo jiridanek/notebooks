@@ -85,20 +85,21 @@ jobs:
       - name: Workaround https://github.com/containers/podman/issues/22152#issuecomment-2027705598
         run: sudo apt-get -qq remove podman crun
 
-      - uses: actions/cache@v4
-        id: cached-linuxbrew
-        with:
-          path: /home/linuxbrew/.linuxbrew
-          key: linuxbrew
-
+#      - uses: actions/cache@v4
+#        id: cached-linuxbrew
+#        with:
+#          path: /home/linuxbrew/.linuxbrew
+#          key: linuxbrew
+#
       - name: Install podman
-        if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
+#        if: steps.cached-linuxbrew.outputs.cache-hit != 'true'
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          /home/linuxbrew/.linuxbrew/bin/brew install podman
-
-      - name: Add linuxbrew to PATH
-        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
+          sudo apt-get install -y podman
+#          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#          /home/linuxbrew/.linuxbrew/bin/brew install podman
+#
+#      - name: Add linuxbrew to PATH
+#        run: echo "/home/linuxbrew/.linuxbrew/bin/" >> $GITHUB_PATH
 
       - name: Configure Podman
         run: |
@@ -284,3 +285,5 @@ jobs:
           IMAGE_REGISTRY: ghcr.io/jiridanek/notebooks/workbench-images
       - run: df -h
         if: "${{ !cancelled() }}"
+
+# ghcr.io/jiridanek/notebooks/workbench-images:jupyter-minimal-ubi9-python-3.9-main_33a177f9fbb7f3581bf0e332fab2401d1bf8ef32
