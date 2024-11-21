@@ -20,6 +20,8 @@ spec:
           image: quay.io/opendatahub/workbench-images:jupyter-minimal-ubi9-python-3.11
           imagePullPolicy: Always
           workingDir: /opt/app-root/src
+          command:
+            - id
           env:
             - name: NOTEBOOK_ARGS
               value: |-
