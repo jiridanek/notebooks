@@ -27,6 +27,7 @@ def main() -> None:
 
     check_call(f"kubectl create namespace {namespace}", shell=True)
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
+    check_call(f"kubectl label namespace {namespace} fake-scc=fake-restricted-v2", shell=True)
 
     try:
         check_call(f"make {deploy}-{args.target}", shell=True)
