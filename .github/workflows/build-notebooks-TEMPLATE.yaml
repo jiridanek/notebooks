@@ -235,6 +235,14 @@ jobs:
         run: |
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=300s
 
+      # Configure a mutating webhook that simulates restricted-v2 using Kyverno
+      # https://kyverno.io/docs/installation/methods/#install-kyverno-using-yamls
+      - name: Install Kyverno
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
+        run: |
+          kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.1/install.yaml
+          kubectl create -f ci/cached-builds/kyverno.yaml
+
       - name: Show nodes status and wait for readiness
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
