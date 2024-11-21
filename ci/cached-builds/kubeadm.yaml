@@ -14,6 +14,9 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   kubeletExtraArgs:
+    # Need to have enough disk space for Kubelet, so move root-dir on the LVM volume
+    # Note: the internets discourage from changing the default because storage plugins may then struggle
+    #  https://cep.dev/posts/adventure-trying-change-kubelet-rootdir/
     root-dir: "/home/runner/.local/share/containers/kubelet-root-dir"
   criSocket: unix:///var/run/crio/crio.sock
   imagePullPolicy: IfNotPresent
@@ -34,5 +37,7 @@ imageRepository: registry.k8s.io
 kind: ClusterConfiguration
 networking:
   dnsDomain: cluster.local
+  # this matches the default in the flannel yaml
+  podSubnet: 10.244.0.0/16
   serviceSubnet: 10.96.0.0/12
 scheduler: {}
