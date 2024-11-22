@@ -208,6 +208,11 @@ jobs:
           sudo systemctl status crio.service || true
           sudo journalctl -xeu crio.service
 
+      # do this early, it's a good check that cri-o is not completely broken
+      - name: "Show crio images information"
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
+        run: sudo crictl images
+
       - name: Install Kubernetes cluster
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
@@ -272,17 +277,15 @@ jobs:
         run: |
           set -Eeuxo pipefail
 
-          kubectl describe deployment --namespace kyverno
+          kubectl describe deployments --namespace kyverno
+          # deployments don't tell me why pods are failing
+          kubectl describe pods --namespace kyverno
 
       - name: Show nodes status and wait for readiness
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           kubectl describe nodes
           kubectl wait --for=condition=Ready nodes --all --timeout=100s || (kubectl describe nodes && false)
-
-      - name: "Show crio images information"
-        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
-        run: sudo crictl images
 
       - name: "Run image tests"
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
