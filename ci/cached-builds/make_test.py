@@ -53,9 +53,6 @@ def main() -> None:
         # regular logs from a running (or finished) pod
         call(f"kubectl logs {namespace}/{pod}", shell=True)
 
-        # Print logs from the kyverno webhook, it should mutate our pod
-        call("kubectl logs --namespace kyverno deployment/kyverno-admission-controller", shell=True)
-
     print(f"[INFO] Finished testing {args.target}")
 
 
