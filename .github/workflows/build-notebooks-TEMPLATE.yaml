@@ -109,6 +109,11 @@ jobs:
           sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
           sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
 
+          # should at least reset storage when touching storage.conf
+          # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
+          sudo CONTAINER_HOST= podman system reset --force
+          mkdir -p $HOME/.local/share/containers/storage/tmp
+
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
           # since `brew services start podman` is buggy, let's do our own brew-compatible service
           # Regarding directory paths, see https://unix.stackexchange.com/questions/224992/where-do-i-put-my-systemd-unit-file
@@ -119,11 +124,8 @@ jobs:
           sudo systemctl unmask --now podman.service podman.socket
           sudo systemctl start podman.socket
 
-          # should at least reset storage when touching storage.conf
-          # remote (CONTAINER_HOST) podman does not accept reset with --force
-          podman system reset
-          mkdir -p $HOME/.local/share/containers/storage/tmp
-
+          # quick check podman works
+          podman ps
       - name: Show error logs (on failure)
         if: ${{ failure() }}
         run: journalctl -xe
