@@ -24,7 +24,6 @@ nodeRegistration:
     root-dir: "/home/runner/.local/share/containers/kubelet-root-dir"
   criSocket: unix:///var/run/crio/crio.sock
   imagePullPolicy: IfNotPresent
-  name: node
   taints: null
 ---
 apiServer:
