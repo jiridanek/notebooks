@@ -114,6 +114,8 @@ jobs:
           # Failed to obtain podman configuration: runroot must be set
           mkdir -p $HOME/.local/share/containers/storage/tmp
           # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
+          podman info || true
+          sudo podman info || true
           sudo CONTAINER_HOST= /home/linuxbrew/.linuxbrew/opt/podman/bin/podman system reset --force
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
