@@ -106,13 +106,15 @@ jobs:
           set -Eeuxo pipefail
           
           # this is also where cri-o gets its storage defaults (that can be overriden in crio.conf)
+          sudo cp ci/cached-builds/containers.conf /etc/containers/containers.conf
           sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
           sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
 
           # should at least reset storage when touching storage.conf
+          # Failed to obtain podman configuration: runroot must be set
+          mkdir -p $HOME/.local/share/containers/storage/tmp
           # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
           sudo CONTAINER_HOST= /home/linuxbrew/.linuxbrew/opt/podman/bin/podman system reset --force
-          mkdir -p $HOME/.local/share/containers/storage/tmp
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
           # since `brew services start podman` is buggy, let's do our own brew-compatible service
