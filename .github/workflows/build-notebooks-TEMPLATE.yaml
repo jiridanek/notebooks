@@ -159,6 +159,7 @@ jobs:
       # Image build
       #
 
+      # only one db can be downloaded in one call https://github.com/aquasecurity/trivy/issues/3616
       - name: Pre-pull Trivy vulnerabilities DB
         if: ${{ contains(fromJson(inputs.github).event.pull_request.labels.*.name, 'trivy-scan') }}
         run: |
@@ -170,6 +171,13 @@ jobs:
               --cache-dir /cache \
               image \
               --download-db-only
+          podman run --rm \
+            --env PODMAN_SOCK \
+            -v ${PWD}/trivy:/cache \
+            docker.io/aquasec/trivy:$TRIVY_VERSION \
+              --cache-dir /cache \
+              image \
+              --download-java-db-only
 
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
       - name: "push|schedule: make ${{ inputs.target }}"
