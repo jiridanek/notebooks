@@ -116,6 +116,7 @@ jobs:
           # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
           podman info || true
           sudo podman info || true
+          ls /home/linuxbrew/.linuxbrew/opt/podman/
           sudo CONTAINER_HOST= /home/linuxbrew/.linuxbrew/opt/podman/bin/podman system reset --force
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
