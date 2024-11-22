@@ -167,8 +167,8 @@ jobs:
             --env PODMAN_SOCK \
             -v ${PWD}/trivy:/cache \
             docker.io/aquasec/trivy:$TRIVY_VERSION \
-              image
               --cache-dir /cache \
+              image \
               --download-db-only
 
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
@@ -450,9 +450,9 @@ jobs:
               -v ${REPORT_FOLDER}:/report \
               -v trivy/:/cache \
               docker.io/aquasec/trivy:$TRIVY_VERSION \
+                --cache-dir /cache \
                 $SCAN_TYPE \
                 $SCAN_ARGS \
-                --cache-dir /cache \
                 --skip-db-update \
                 --scanners vuln --ignore-unfixed \
                 --exit-code 0 --timeout 30m \
