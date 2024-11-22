@@ -23,7 +23,9 @@ def main() -> None:
     else:
         deploy = "deploy9"
 
-    namespace = "ns-" + args.target.translate(str.maketrans(".", "-"))
+    prefix = args.target.translate(str.maketrans(".", "-"))
+    pod = prefix + "-notebook-0"  # `$(kubectl get statefulset -o name | head -n 1)` would work too
+    namespace = "ns-" + prefix
 
     check_call(f"kubectl create namespace {namespace}", shell=True)
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
@@ -34,15 +36,22 @@ def main() -> None:
         check_call(f"make test-{args.target}", shell=True)
         check_call(f"make un{deploy}-{args.target}", shell=True)
     finally:
+        # dump a lot of info to the GHA logs
+
         call(f"kubectl get statefulsets", shell=True)
         call(f"kubectl describe statefulsets", shell=True)
         call(f"kubectl get pods", shell=True)
         call(f"kubectl describe pods", shell=True)
+        # describe does not show everything about the pod
         call(f"kubectl get pods -o yaml", shell=True)
 
+        # events aren't all that useful, but it can tell what was happening in the current namespace
         call(f"kubectl get events", shell=True)
-        call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1) --previous", shell=True)
-        call(f"kubectl logs $(kubectl get statefulset -o name | head -n 1)", shell=True)
+
+        # relevant if the pod is crashlooping, this shows the final lines
+        call(f"kubectl logs {namespace}/{pod} --previous", shell=True)
+        # regular logs from a running (or finished) pod
+        call(f"kubectl logs {namespace}/{pod}", shell=True)
 
         # Print logs from the kyverno webhook, it should mutate our pod
         call("kubectl logs --namespace kyverno deployment/kyverno-admission-controller", shell=True)
