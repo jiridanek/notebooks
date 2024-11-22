@@ -276,6 +276,8 @@ jobs:
         run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
         env:
           IMAGE_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
+          # for make deploy
+          NOTEBOOK_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
 
       #        env:
 #          KIND_EXPERIMENTAL_PROVIDER: podman
