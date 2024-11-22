@@ -129,6 +129,9 @@ jobs:
           sudo systemctl unmask --now podman.service podman.socket
           sudo systemctl start podman.socket
 
+          # needed (much) later for trivy
+          echo "PODMAN_SOCK=/var/run/podman/podman.sock" >> $GITHUB_ENV
+
           # quick check podman works
           podman ps
       - name: Show error logs (on failure)
