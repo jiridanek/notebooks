@@ -263,32 +263,7 @@ jobs:
       - name: Wait for pods to be running
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
-          kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=300s
-
-      # Configure a mutating webhook that simulates restricted-v2 using Kyverno
-      # https://kyverno.io/docs/installation/methods/#install-kyverno-using-yamls
-      - name: Install Kyverno
-        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
-        run: |
-          set -Eeuxo pipefail
-
-          kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.1/install.yaml
-          kubectl wait deployment --all --namespace kyverno --for=condition=Available --timeout=100s
-
-          # this can fail if webhook is not yet ready to answer, retry is needed
-          timeout 60s bash -c 'until kubectl create -f ci/cached-builds/kyverno.yaml; do sleep 1; done'
-          # wait for policy to be in effect
-          kubectl wait --for=condition=Ready clusterpolicy --all
-
-      - name: Show debug data (on failure)
-        if: ${{ failure() }}
-        run: |
-          set -Eeuxo pipefail
-
-          kubectl describe deployments --namespace kyverno
-          # deployments don't tell me why pods are failing
-          kubectl describe pods --namespace kyverno
-          kubectl logs deployments/kyverno-admission-controller --namespace kyverno
+          kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
       - name: Show nodes status and wait for readiness
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
