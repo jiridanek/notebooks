@@ -42,9 +42,7 @@ def run_tests(target: str) -> None:
         deploy_target = target.replace("rocm-runtime-", "runtimes-rocm-")
     elif target.startswith("rocm-jupyter-"):
         deploy = "deploy9"
-        deploy_target = (target
-                         .replace("rocm-jupyter-", "jupyter-rocm-")
-                         .replace("-python-", "-ubi9-python-"))
+        deploy_target = target.replace("rocm-jupyter-", "jupyter-rocm-")
     elif target.startswith("rstudio-"):
         deploy = "deploy"
         os = re.match(r"^rstudio-([^-]+-).*", target)
@@ -71,15 +69,15 @@ def run_tests(target: str) -> None:
         if target.startswith("runtime-") or target.startswith("intel-runtime-"):
             check_call(f"make validate-runtime-image image={target}", shell=True)
         elif target.startswith("rocm-runtime-"):
-            check_call(f"make validate-runtime-image image={target.replace("rocm-runtime-", "runtime-rocm-")}", shell=True)
+            check_call(f"make validate-runtime-image image={target
+                       .replace("rocm-runtime-", "runtime-rocm-")}", shell=True)
         elif target.startswith("rstudio-"):
             check_call(f"make validate-rstudio-image image={target}", shell=True)
         elif target.startswith("codeserver-"):
             check_call(f"make validate-codeserver-image image={target}", shell=True)
         elif target.startswith("rocm-jupyter"):
             check_call(f"make test-{target
-                       .replace("rocm-jupyter-", "jupyter-rocm-")
-                       .replace("-python-", "-ubi9-python-")}", shell=True)
+                       .replace("rocm-jupyter-", "jupyter-rocm-")}", shell=True)
         else:
             check_call(f"make test-{target}", shell=True)
     finally:
@@ -154,7 +152,7 @@ class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
     def test_make_commands_jupyter_rocm(self, mock_execute: unittest.mock.Mock) -> None:
         """Compares the commands with what we had in the openshift/release yaml"""
-        run_tests("rocm-jupyter-tensorflow-python-3.11")
+        run_tests("rocm-jupyter-tensorflow-ubi9-python-3.11")
         commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
         assert "make deploy9-jupyter-rocm-tensorflow-ubi9-python-3.11" in commands
         assert "make test-jupyter-rocm-tensorflow-ubi9-python-3.11" in commands
