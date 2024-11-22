@@ -114,7 +114,7 @@ jobs:
           cp ci/cached-builds/podman.service /etc/systemd/system/podman.service
           cp ci/cached-builds/podman.socket /etc/systemd/system/podman.socket
           sudo systemctl daemon-reload
-          sudo systemctl start podman.socket
+          sudo systemctl enable --now podman.socket
 
           # should at least reset storage when touching storage.conf
           podman system reset --force
