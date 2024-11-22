@@ -65,7 +65,10 @@ else
   sudo mkfs.ext4 -Enodiscard -m0 "/dev/mapper/${VG_NAME}-buildlv"
 fi
 mkdir -p "${build_mount_path}"
-sudo mount "/dev/mapper/${VG_NAME}-buildlv" "${build_mount_path}"
+# https://www.alibabacloud.com/help/en/ecs/use-cases/mount-parameters-for-ext4-file-systems?spm=a2c63.p38356.help-menu-25365.d_5_10_12.48ce3be5RixoUB#8e740ed072m5o
+# need user_xattr, otherwise I will get this or something similar
+#  processing tar file(lsetxattr /dev/console: operation not permitted)
+sudo mount -o defaults,noatime,nodiratime,nobarrier,nodelalloc,data=writeback,user_xattr "/dev/mapper/${VG_NAME}-buildlv" "${build_mount_path}"
 sudo chown -R "${build_mount_path_ownership}" "${build_mount_path}"
 
 # if build mount path is a parent of $GITHUB_WORKSPACE, and has been deleted, recreate it
