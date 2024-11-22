@@ -364,6 +364,15 @@ jobs:
       # Trivy security scan
       #
 
+      # The previous steps may've taken too long, we are no longer logged-in, and Trivy
+      # would fail to pull vulnerabilities DB then
+      - name: Re-login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: "pull_request|schedule: resolve target if Trivy scan should run"
         id: resolve-target
         if: ${{ fromJson(inputs.github).event_name == 'pull_request' || fromJson(inputs.github).event_name == 'schedule' }}
