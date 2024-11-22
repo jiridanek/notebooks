@@ -3,15 +3,16 @@
 
 # https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta3/
 # https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta4/
+---
 apiVersion: kubeadm.k8s.io/v1beta3
 bootstrapTokens:
-- groups:
-  - system:bootstrappers:kubeadm:default-node-token
-  token: abcdef.0123456789abcdef
-  ttl: 24h0m0s
-  usages:
-  - signing
-  - authentication
+  - groups:
+      - system:bootstrappers:kubeadm:default-node-token
+    token: abcdef.0123456789abcdef
+    ttl: 24h0m0s
+    usages:
+      - signing
+      - authentication
 kind: InitConfiguration
 localAPIEndpoint:
   bindPort: 6443
@@ -31,8 +32,8 @@ apiServer:
 apiVersion: kubeadm.k8s.io/v1beta3
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
-controllerManager: {}
-dns: {}
+controllerManager: { }
+dns: { }
 etcd:
   local:
     dataDir: /var/lib/etcd
@@ -42,4 +43,4 @@ networking:
   dnsDomain: cluster.local
   # this matches the default in the flannel yaml (--pod-network-cidr=10.244.0.0/16)
   podSubnet: 10.244.0.0/16
-scheduler: {}
+scheduler: { }
