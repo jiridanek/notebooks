@@ -448,7 +448,7 @@ jobs:
           podman run --rm \
               $PODMAN_ARGS \
               -v ${REPORT_FOLDER}:/report \
-              -v trivy/:/cache \
+              -v ${PWD}/trivy:/cache \
               docker.io/aquasec/trivy:$TRIVY_VERSION \
                 --cache-dir /cache \
                 $SCAN_TYPE \
