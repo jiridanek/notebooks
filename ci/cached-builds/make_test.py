@@ -96,9 +96,10 @@ def run_tests(target: str) -> None:
         call(f"kubectl get events", shell=True)
 
         # relevant if the pod is crashlooping, this shows the final lines
-        call(f"kubectl logs pod/{pod} --previous", shell=True)
+        # use the negative label selector as a trick to match all pods (as we don't have any pods with nosuchlabel)
+        call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps --previous", shell=True)
         # regular logs from a running (or finished) pod
-        call(f"kubectl logs pod/{pod}", shell=True)
+        call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps", shell=True)
 
     print(f"[INFO] Finished testing {target}")
 
