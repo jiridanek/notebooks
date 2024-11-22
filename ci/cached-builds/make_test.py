@@ -27,6 +27,7 @@ def main() -> None:
 
 def run_tests(target: str) -> None:
     prefix = target.translate(str.maketrans(".", "-"))
+    # this is a pod name in statefulset, some tests deploy individual unmanaged pods, though
     pod = prefix + "-notebook-0"  # `$(kubectl get statefulset -o name | head -n 1)` would work too
     namespace = "ns-" + prefix
 
@@ -129,7 +130,7 @@ def wait_for_stability(pod: str) -> None:
     """
     timeout = 100
     for _ in range(3):
-        call(f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; do sleep 1; done'", shell=True)
+        call(f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pods --all --timeout 5s; do sleep 1; done'", shell=True)
         timeout = 50
         time.sleep(3)
 
