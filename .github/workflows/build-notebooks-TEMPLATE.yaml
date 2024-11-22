@@ -108,7 +108,6 @@ jobs:
           set -Eeuxo pipefail
           
           # podman running as service ignores the TMPDIR env var here, let's give it a bind-mount to /var/tmp
-          sudo umount /var/tmp
           mkdir -p $TMPDIR
           sudo mount --bind -o rw,noexec,nosuid,nodev,bind $TMPDIR /var/tmp
 
