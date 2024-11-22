@@ -7,7 +7,6 @@ import typing
 import unittest
 
 import gha_pr_changed_files
-from tests.test_main import PROJECT_ROOT
 
 """Determines whether we have deploy Makefile tests for this target or not
 
@@ -37,7 +36,7 @@ def check_tests(target: str) -> bool:
     has_tests = False
     dirs = gha_pr_changed_files.analyze_build_directories(target)
     for d in reversed(dirs):  # (!)
-        kustomization = pathlib.Path(PROJECT_ROOT) / d / "kustomize/base/kustomization.yaml"
+        kustomization = pathlib.Path(gha_pr_changed_files.PROJECT_ROOT) / d / "kustomize/base/kustomization.yaml"
         has_tests = has_tests or kustomization.is_file()
         break  # TODO: check only the last directory (the top level layer) for now
     return has_tests
