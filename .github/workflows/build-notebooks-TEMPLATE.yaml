@@ -200,6 +200,14 @@ jobs:
           CRIO_VERSION: v1.30
           KUBERNETES_VERSION: v1.30
 
+      - name: Show crio debug data (on failure)
+        if: ${{ failure() }}
+        run: |
+          set -Eeuxo pipefail
+
+          sudo systemctl status crio.service || true
+          sudo journalctl -xeu crio.service
+
       - name: Install Kubernetes cluster
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
@@ -216,7 +224,7 @@ jobs:
           sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
           sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-      - name: Show debug data (on failure)
+      - name: Show kubelet debug data (on failure)
         if: ${{ failure() }}
         run: |
           set -Eeuxo pipefail
