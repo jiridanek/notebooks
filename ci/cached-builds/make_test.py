@@ -4,6 +4,7 @@ import functools
 import re
 import subprocess
 import sys
+import time
 import typing
 import unittest
 import unittest.mock
@@ -120,12 +121,17 @@ def execute(executor: typing.Callable, args: tuple, kwargs: dict) -> int:
     return result
 
 
+# TODO(jdanek) this is a dumb impl, needs to be improved
 def wait_for_stability(pod: str) -> None:
     """Waits for the pod to be stable. Often I'm seeing that the probes initially fail.
     > error: Internal error occurred: error executing command in container: container is not created or running
     > error: unable to upgrade connection: container not found ("notebook")
     """
-    call(f"timeout 60s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; do sleep 1; done'", shell=True)
+    timeout = 100
+    for _ in range(3):
+        call(f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; do sleep 1; done'", shell=True)
+        timeout = 50
+        time.sleep(3)
 
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
