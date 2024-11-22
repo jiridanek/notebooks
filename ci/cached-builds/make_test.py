@@ -44,6 +44,13 @@ def run_tests(target: str) -> None:
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
     check_call(f"kubectl label namespace {namespace} fake-scc=fake-restricted-v2", shell=True)
 
+    # wait for service account to be created, otherwise pod is refused to be created
+    # $ bin/kubectl apply -k runtimes/minimal/ubi9-python-3.9/kustomize/base
+    # configmap/runtime-req-config-9hhb2bhhmd created
+    # Error from server (Forbidden): error when creating "runtimes/minimal/ubi9-python-3.9/kustomize/base": pods "runtime-pod" is forbidden: error looking up service account ns-runtime-minimal-ubi9-python-3-9/default: serviceaccount "default" not found
+    # See https://github.com/kubernetes/kubernetes/issues/66689
+    check_call(f"timeout 10s bash -c 'until kubectl get serviceaccount/default; do sleep 1; done'", shell=True)
+
     check_call(f"make {deploy}-{deploy_target}", shell=True)
     try:
         if target.startswith("runtime-"):
