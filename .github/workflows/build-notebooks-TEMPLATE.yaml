@@ -111,11 +111,9 @@ jobs:
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
           # since `brew services start podman` is buggy, let's do our own brew-compatible service
-          cp ci/cached-builds/podman.service /etc/systemd/system/podman.service
-          cp ci/cached-builds/podman.socket /etc/systemd/system/podman.socket
+          sudo cp ci/cached-builds/podman.service /etc/systemd/system/podman.service
+          sudo cp ci/cached-builds/podman.socket /etc/systemd/system/podman.socket
           sudo systemctl daemon-reload
-          # no idea why it is masked
-          sudo systemctl unmask podman.socket
           sudo systemctl start podman.socket
 
           # should at least reset storage when touching storage.conf
