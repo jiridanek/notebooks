@@ -66,6 +66,7 @@ def run_tests(target: str) -> None:
 
     check_call(f"make {deploy}-{deploy_target}", shell=True)
     wait_for_stability(pod)
+
     try:
         if target.startswith("runtime-") or target.startswith("intel-runtime-"):
             check_call(f"make validate-runtime-image image={target}", shell=True)
@@ -81,7 +82,6 @@ def run_tests(target: str) -> None:
                        .replace("-python-", "-ubi9-python-")}", shell=True)
         else:
             check_call(f"make test-{target}", shell=True)
-        check_call(f"make un{deploy}-{deploy_target}", shell=True)
     finally:
         # dump a lot of info to the GHA logs
 
@@ -100,6 +100,8 @@ def run_tests(target: str) -> None:
         call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps --previous", shell=True)
         # regular logs from a running (or finished) pod
         call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps", shell=True)
+
+    check_call(f"make un{deploy}-{deploy_target}", shell=True)
 
     print(f"[INFO] Finished testing {target}")
 
@@ -131,9 +133,11 @@ def wait_for_stability(pod: str) -> None:
     """
     timeout = 100
     for _ in range(3):
-        call(f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pods --all --timeout 5s; do sleep 1; done'", shell=True)
+        call(
+            f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pods --all --timeout 5s; do sleep 1; done'", shell=True)
         timeout = 50
         time.sleep(3)
+
 
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
@@ -198,6 +202,7 @@ class TestMakeTest(unittest.TestCase):
         assert "make deploy9-runtimes-rocm-pytorch-ubi9-python-3.11" in commands
         assert "make validate-runtime-image image=runtime-rocm-pytorch-ubi9-python-3.11" in commands
         assert "make undeploy9-runtimes-rocm-pytorch-ubi9-python-3.11" in commands
+
 
 if __name__ == "__main__":
     main()
