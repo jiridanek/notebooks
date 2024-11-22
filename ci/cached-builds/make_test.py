@@ -139,6 +139,7 @@ def wait_for_stability(pod: str) -> None:
         time.sleep(3)
 
 
+@unittest.mock.patch("time.sleep", unittest.mock.Mock())
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
     def test_make_commands_jupyter(self, mock_execute: unittest.mock.Mock) -> None:
