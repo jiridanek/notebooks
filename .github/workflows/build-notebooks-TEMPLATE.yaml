@@ -171,8 +171,7 @@ jobs:
 
       - name: "Check if we have tests or not"
         id: have-tests
-#        run: "ci/cached-builds/has_tests.py --target ${{ inputs.target }}"
-        run: echo "tests=true" >> "$GITHUB_OUTPUT"
+        run: "ci/cached-builds/has_tests.py --target ${{ inputs.target }}"
 
       - run: ip addr ls
 
@@ -298,8 +297,7 @@ jobs:
 
       - name: "Run image tests"
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
-#        run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
-        run: python3 ci/cached-builds/make_test.py --target jupyter-minimal-ubi9-python-3.11
+        run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
         env:
           IMAGE_TAG: "${{ steps.calculated_vars.outputs.IMAGE_TAG }}"
 
