@@ -458,7 +458,7 @@ undeploy-c9s-%: bin/kubectl
 define test_with_papermill
 	$(eval PREFIX_NAME := $(subst /,-,$(1)_$(2))) \
 	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "python3 -m pip install papermill" ; \
-	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "wget ${NOTEBOOK_REPO_BRANCH_BASE}/jupyter/$(1)/$(2)-$(3)/test/test_notebook.ipynb -O test_notebook.ipynb && python3 -m papermill test_notebook.ipynb $(PREFIX_NAME)_output.ipynb --kernel python3 --stderr-file $(PREFIX_NAME)_error.txt" ; \
+	$(KUBECTL_BIN) exec $(FULL_NOTEBOOK_NAME) -- /bin/sh -c "wget ${NOTEBOOK_REPO_BRANCH_BASE}/jupyter/$(1)/$(2)-$(3)/test/test_notebook.ipynb --retry-on-host-error -O test_notebook.ipynb && python3 -m papermill test_notebook.ipynb $(PREFIX_NAME)_output.ipynb --kernel python3 --stderr-file $(PREFIX_NAME)_error.txt" ; \
     if [ $$? -ne 0 ]; then \
 		echo "ERROR: The $(1) $(2) notebook encountered a failure. To investigate the issue, you can review the logs located in the ocp-ci cluster on 'artifacts/notebooks-e2e-tests/jupyter-$(1)-$(2)-$(3)-test-e2e' directory or run 'cat $(PREFIX_NAME)_error.txt' within your container. The make process has been aborted." ; \
 		exit 1 ; \
