@@ -23,7 +23,7 @@ spec:
           command:
             - bash
             - -c
-            - id; jupyter lab --ServerApp.root_dir=/opt/app-root/src --ServerApp.port=8888 --ServerApp.token='' --ServerApp.password='' --ServerApp.base_url=/notebook/opendatahub/jovyan --ServerApp.quit_button=False '--ServerApp.tornado_settings={"user":"jovyan","hub_host":"https://opendatahub.io","hub_prefix":"/notebookController/jovyan"}' --ServerApp.ip=0.0.0.0 --ServerApp.allow_origin=* --ServerApp.open_browser=False; ls -AlFd /opt/app-root/src/.local /opt/app-root/src; exit 1
+            - id; jupyter lab --ServerApp.root_dir=/opt/app-root/src --ServerApp.port=8888 --ServerApp.token='' --ServerApp.password='' --ServerApp.base_url=/notebook/opendatahub/jovyan --ServerApp.quit_button=False '--ServerApp.tornado_settings={"user":"jovyan","hub_host":"https://opendatahub.io","hub_prefix":"/notebookController/jovyan"}' --ServerApp.ip=0.0.0.0 --ServerApp.allow_origin=* --ServerApp.open_browser=False; ls -AlFd /opt/app-root/src/.local /opt/app-root/src
           env:
             - name: NOTEBOOK_ARGS
               value: |-
