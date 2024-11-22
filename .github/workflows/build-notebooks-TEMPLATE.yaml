@@ -123,6 +123,10 @@ jobs:
           podman system reset --force
           mkdir -p $HOME/.local/share/containers/storage/tmp
 
+      - name: Show error logs (on failure)
+        if: ${{ failure() }}
+        run: journalctl -xe
+
       - name: Calculate image name and tag
         id: calculated_vars
         run: |
