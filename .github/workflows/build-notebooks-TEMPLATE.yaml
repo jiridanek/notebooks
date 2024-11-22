@@ -105,7 +105,7 @@ jobs:
         run: |
           set -Eeuxo pipefail
           
-          # podman from brew has its own /etc
+          # podman from brew has its own /etc (was giving me Failed to obtain podman configuration: runroot must be set)
           # the (default) config location is also where cri-o gets its storage defaults (that can be overriden in crio.conf)
           sudo cp ci/cached-builds/containers.conf /etc/containers.conf
           sudo cp ci/cached-builds/containers.conf /home/linuxbrew/.linuxbrew/opt/podman/etc/containers.conf
@@ -114,13 +114,9 @@ jobs:
           sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
           sudo cp ci/cached-builds/registries.conf /home/linuxbrew/.linuxbrew/opt/podman/etc/containers/registries.conf
 
-          # should at least reset storage when touching storage.conf
-          # Failed to obtain podman configuration: runroot must be set
+          # should reset storage when changing storage.conf
           mkdir -p $HOME/.local/share/containers/storage/tmp
           # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
-          podman info || true
-          sudo podman info || true
-          ls /home/linuxbrew/.linuxbrew/opt/podman/
           sudo /home/linuxbrew/.linuxbrew/opt/podman/bin/podman system reset --force
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
