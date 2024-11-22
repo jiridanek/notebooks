@@ -206,7 +206,7 @@ jobs:
         run: |
           mkdir -p runtimes/rocm
           ln -s runtimes/rocm-tensorflow runtimes/rocm/tensorflow
-          ln -s runtimes/rocm-pytorch runtimes/rocm/pythorch
+          ln -s runtimes/rocm-pytorch runtimes/rocm/pytorch
 
       # https://cri-o.io/
       - name: Install cri-o
