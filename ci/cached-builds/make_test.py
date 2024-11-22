@@ -116,7 +116,7 @@ def wait_for_stability(pod: str) -> None:
     > error: Internal error occurred: error executing command in container: container is not created or running
     > error: unable to upgrade connection: container not found ("notebook")
     """
-    call(f"timeout 60s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; sleep 1; done'", shell=True)
+    call(f"timeout 60s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; do sleep 1; done'", shell=True)
 
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
