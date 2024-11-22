@@ -49,9 +49,9 @@ def main() -> None:
         call(f"kubectl get events", shell=True)
 
         # relevant if the pod is crashlooping, this shows the final lines
-        call(f"kubectl logs {namespace}/{pod} --previous", shell=True)
+        call(f"kubectl logs pod/{pod} --previous", shell=True)
         # regular logs from a running (or finished) pod
-        call(f"kubectl logs {namespace}/{pod}", shell=True)
+        call(f"kubectl logs pod/{pod}", shell=True)
 
     print(f"[INFO] Finished testing {args.target}")
 
