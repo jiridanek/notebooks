@@ -134,7 +134,7 @@ def wait_for_stability(pod: str) -> None:
     timeout = 100
     for _ in range(3):
         call(
-            f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=running pods --all --timeout 5s; do sleep 1; done'", shell=True)
+            f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=Ready pods --all --timeout 5s; do sleep 1; done'", shell=True)
         timeout = 50
         time.sleep(3)
 
