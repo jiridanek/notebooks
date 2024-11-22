@@ -158,6 +158,10 @@ jobs:
       # Image build
       #
 
+      - name: Pre-pull Trivy vulnerabilities DB
+        if: ${{ contains(fromJson(inputs.github).event.pull_request.labels.*.name, 'trivy-scan') }}
+        run: podman pull ghcr.io/aquasecurity/trivy-db
+
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
       - name: "push|schedule: make ${{ inputs.target }}"
         run: |
@@ -439,6 +443,7 @@ jobs:
               docker.io/aquasec/trivy:$TRIVY_VERSION \
                 $SCAN_TYPE \
                 $SCAN_ARGS \
+                --skip-db-update \
                 --scanners vuln --ignore-unfixed \
                 --exit-code 0 --timeout 30m \
                 --format template --template "@/report/$REPORT_TEMPLATE" -o /report/$REPORT_FILE \
