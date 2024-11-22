@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import functools
+import re
 import subprocess
 import sys
 import typing
+import unittest
+import unittest.mock
 
 """Runs the make commands used to deploy, test, and undeploy image in Kubernetes"""
 
@@ -18,23 +21,40 @@ def main() -> None:
     parser.add_argument("--target", type=str)
     args = typing.cast(Args, parser.parse_args())
 
-    if args.target.startswith("rstudio"):
-        deploy = "deploy"
-    else:
-        deploy = "deploy9"
+    run_tests(args.target)
 
-    prefix = args.target.translate(str.maketrans(".", "-"))
+
+def run_tests(target: str) -> None:
+    prefix = target.translate(str.maketrans(".", "-"))
     pod = prefix + "-notebook-0"  # `$(kubectl get statefulset -o name | head -n 1)` would work too
     namespace = "ns-" + prefix
+
+    if target.startswith("rstudio-"):
+        deploy = "deploy"
+        os = re.match(r"^rstudio-([^-]+-).*", target)
+        deploy_target = os.group(1) + target
+    elif target.startswith("runtime-"):
+        deploy = "deploy9"
+        deploy_target = target.replace("runtime-", "runtimes-")
+    else:
+        deploy = "deploy9"
+        deploy_target = target
 
     check_call(f"kubectl create namespace {namespace}", shell=True)
     check_call(f"kubectl config set-context --current --namespace={namespace}", shell=True)
     check_call(f"kubectl label namespace {namespace} fake-scc=fake-restricted-v2", shell=True)
 
-    check_call(f"make {deploy}-{args.target}", shell=True)
+    check_call(f"make {deploy}-{deploy_target}", shell=True)
     try:
-        check_call(f"make test-{args.target}", shell=True)
-        check_call(f"make un{deploy}-{args.target}", shell=True)
+        if target.startswith("runtime-"):
+            check_call(f"make validate-runtime-image image={target}", shell=True)
+        elif target.startswith("rstudio-"):
+            check_call(f"make validate-rstudio-image image={target}", shell=True)
+        elif target.startswith("codeserver-"):
+            check_call(f"make validate-codeserver-image image={target}", shell=True)
+        else:
+            check_call(f"make test-{target}", shell=True)
+        check_call(f"make un{deploy}-{deploy_target}", shell=True)
     finally:
         # dump a lot of info to the GHA logs
 
@@ -53,27 +73,64 @@ def main() -> None:
         # regular logs from a running (or finished) pod
         call(f"kubectl logs pod/{pod}", shell=True)
 
-    print(f"[INFO] Finished testing {args.target}")
+    print(f"[INFO] Finished testing {target}")
 
 
 @functools.wraps(subprocess.check_call)
 def check_call(*args, **kwargs) -> int:
-    print(f"[INFO] Running command {args, kwargs}")
-    sys.stdout.flush()
-    result = subprocess.check_call(*args, **kwargs)
-    print(f"\tDONE running command {args, kwargs}")
-    sys.stdout.flush()
-    return result
+    return execute(subprocess.check_call, args, kwargs)
+
 
 @functools.wraps(subprocess.call)
 def call(*args, **kwargs) -> int:
+    return execute(subprocess.call, args, kwargs)
+
+
+def execute(executor: typing.Callable, args: tuple, kwargs: dict) -> int:
     print(f"[INFO] Running command {args, kwargs}")
     sys.stdout.flush()
-    result = subprocess.call(*args, **kwargs)
+    result = executor(*args, **kwargs)
     print(f"\tDONE running command {args, kwargs}")
     sys.stdout.flush()
     return result
 
+
+class TestMakeTest(unittest.TestCase):
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_jupyter(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("jupyter-minimal-ubi9-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy9-jupyter-minimal-ubi9-python-3.11" in commands
+        assert "make test-jupyter-minimal-ubi9-python-3.11" in commands
+        assert "make undeploy9-jupyter-minimal-ubi9-python-3.11" in commands
+
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_codeserver(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("codeserver-ubi9-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy9-codeserver-ubi9-python-3.11" in commands
+        assert "make validate-codeserver-image image=codeserver-ubi9-python-3.11" in commands
+        assert "make undeploy9-codeserver-ubi9-python-3.11" in commands
+
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_rstudio(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("rstudio-c9s-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy-c9s-rstudio-c9s-python-3.11" in commands
+        assert "make validate-rstudio-image image=rstudio-c9s-python-3.11" in commands
+        assert "make undeploy-c9s-rstudio-c9s-python-3.11" in commands
+
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_runtime(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("runtime-datascience-ubi9-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy9-runtimes-datascience-ubi9-python-3.11" in commands
+        assert "make validate-runtime-image image=runtime-datascience-ubi9-python-3.11" in commands
+        assert "make undeploy9-runtimes-datascience-ubi9-python-3.11" in commands
 
 if __name__ == "__main__":
     main()
