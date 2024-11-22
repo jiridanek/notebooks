@@ -120,7 +120,8 @@ jobs:
           sudo systemctl start podman.socket
 
           # should at least reset storage when touching storage.conf
-          podman system reset --force
+          # remote (CONTAINER_HOST) podman does not accept reset with --force
+          podman system reset
           mkdir -p $HOME/.local/share/containers/storage/tmp
 
       - name: Show error logs (on failure)
