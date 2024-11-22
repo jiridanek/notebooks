@@ -139,6 +139,7 @@ def wait_for_stability(pod: str) -> None:
         time.sleep(3)
 
 
+# https://docs.python.org/3/library/unittest.mock-examples.html#patch-decorators
 @unittest.mock.patch("time.sleep", unittest.mock.Mock())
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
