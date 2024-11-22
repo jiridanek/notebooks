@@ -35,6 +35,9 @@ def run_tests(target: str) -> None:
     elif target.startswith("intel-runtime-"):
         deploy = "deploy9"
         deploy_target = target.replace("intel-runtime-", "intel-runtimes-")
+    elif target.startswith("rocm-runtime-"):
+        deploy = "deploy9"
+        deploy_target = target.replace("rocm-runtime-", "runtimes-rocm-")
     elif target.startswith("rstudio-"):
         deploy = "deploy"
         os = re.match(r"^rstudio-([^-]+-).*", target)
@@ -59,6 +62,8 @@ def run_tests(target: str) -> None:
     try:
         if target.startswith("runtime-") or target.startswith("intel-runtime-"):
             check_call(f"make validate-runtime-image image={target}", shell=True)
+        elif target.startswith("rocm-runtime-"):
+            check_call(f"make validate-runtime-image image={target.replace("rocm-runtime-", "runtime-rocm-")}", shell=True)
         elif target.startswith("rstudio-"):
             check_call(f"make validate-rstudio-image image={target}", shell=True)
         elif target.startswith("codeserver-"):
@@ -158,6 +163,15 @@ class TestMakeTest(unittest.TestCase):
         assert "make deploy9-intel-runtimes-ml-ubi9-python-3.11" in commands
         assert "make validate-runtime-image image=intel-runtime-ml-ubi9-python-3.11" in commands
         assert "make undeploy9-intel-runtimes-ml-ubi9-python-3.11" in commands
+
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_rocm_runtime(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("rocm-runtime-pytorch-ubi9-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy9-runtimes-rocm-pytorch-ubi9-python-3.11" in commands
+        assert "make validate-runtime-image image=runtime-rocm-pytorch-ubi9-python-3.11" in commands
+        assert "make undeploy9-runtimes-rocm-pytorch-ubi9-python-3.11" in commands
 
 if __name__ == "__main__":
     main()
