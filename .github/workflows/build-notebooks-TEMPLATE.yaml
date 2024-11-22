@@ -111,7 +111,7 @@ jobs:
 
           # should at least reset storage when touching storage.conf
           # remote (CONTAINER_HOST) podman does not do reset (and refuses --force option)
-          sudo CONTAINER_HOST= podman system reset --force
+          sudo CONTAINER_HOST= /home/linuxbrew/.linuxbrew/opt/podman/bin/podman system reset --force
           mkdir -p $HOME/.local/share/containers/storage/tmp
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
