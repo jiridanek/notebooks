@@ -20,6 +20,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     env:
+      # Use the rootful instance of podman for sharing images with cri-o
+      # https://podman-desktop.io/blog/sharing-podman-images-with-kubernetes-cluster#introduction
+      # https://access.redhat.com/solutions/6986565
+      CONTAINER_HOST: unix:///var/run/podman/podman.sock
       # We don't push here when building PRs, so we can use the same IMAGE_REGISTRY in all branches of the workflow
       IMAGE_REGISTRY: "ghcr.io/${{ github.repository }}/workbench-images"
       # GitHub image registry used for storing $(CONTAINER_ENGINE)'s cache
@@ -28,9 +32,6 @@ jobs:
       TRIVY_SCAN_FS_JSON: '{}'
 
     steps:
-
-      - run: env
-      - run: ip addr ls
 
       - uses: actions/checkout@v4
 
@@ -102,28 +103,22 @@ jobs:
 
       - name: Configure Podman
         run: |
-          set -x
-          mkdir -p $HOME/.config/containers/
-          cp ci/cached-builds/containers.conf $HOME/.config/containers/containers.conf
-          cp ci/cached-builds/storage.conf $HOME/.config/containers/storage.conf
+          set -Eeuxo pipefail
+          
+          # this is also where cri-o gets its storage defaults (that can be overriden in crio.conf)
+          sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
+          sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
+
+          # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
+          # since `brew services start podman` is buggy, let's do our own brew-compatible service
+          cp ci/cached-builds/podman.service /etc/systemd/system/podman.service
+          cp ci/cached-builds/podman.socket /etc/systemd/system/podman.socket
+          sudo systemctl daemon-reload
+          systemctl start podman.socket
 
           # should at least reset storage when touching storage.conf
           podman system reset --force
           mkdir -p $HOME/.local/share/containers/storage/tmp
-
-          # configure for rootless KinD
-          # https://kind.sigs.k8s.io/docs/user/rootless/
-          sudo mkdir -p /etc/systemd/system/user@.service.d
-          sudo cp ci/cached-builds/delegate.conf /etc/systemd/system/user@.service.d/delegate.conf
-          sudo systemctl daemon-reload
-
-          # start systemd user service
-          # since `brew services start podman` is buggy, let's do our own brew-compatible service
-          mkdir -p "${HOME}/.config/systemd/user/"
-          cp ci/cached-builds/homebrew.podman.service "${HOME}/.config/systemd/user/homebrew.podman.service"
-          systemctl --user daemon-reload
-          systemctl --user start homebrew.podman.service
-          echo "PODMAN_SOCK=/run/user/${UID}/podman/podman.sock" >> $GITHUB_ENV
 
       - name: Calculate image name and tag
         id: calculated_vars
@@ -192,12 +187,6 @@ jobs:
           
           sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
           sudo rm -rf /etc/cni/net.d/11-crio-ipv4-bridge.conflist
-          # this is where cri-o gets its storage defaults (that can be overriden in crio.conf.d/
-          sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
-          sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
-          # https://unix.stackexchange.com/questions/17402/why-does-root-get-permission-denied-when-accessing-fuse-directory
-          # fix for: processing tar file(lsetxattr /dev/console: operation not permitted)
-          sudo cp ci/cached-builds/fuse.conf /etc/fuse.conf
           
           sudo systemctl start crio.service
         env:
