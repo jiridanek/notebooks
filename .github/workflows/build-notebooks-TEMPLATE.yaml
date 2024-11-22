@@ -410,7 +410,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         if: ${{ steps.resolve-target.outputs.target }}
         run: |
-          TRIVY_VERSION=0.53.0
+          TRIVY_VERSION=0.57.1
           REPORT_FOLDER=${{ github.workspace }}/report
           REPORT_FILE=trivy-report.md
           REPORT_TEMPLATE=trivy-markdown.tpl
