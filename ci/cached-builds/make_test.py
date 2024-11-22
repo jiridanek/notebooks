@@ -29,13 +29,16 @@ def run_tests(target: str) -> None:
     pod = prefix + "-notebook-0"  # `$(kubectl get statefulset -o name | head -n 1)` would work too
     namespace = "ns-" + prefix
 
-    if target.startswith("rstudio-"):
+    if target.startswith("runtime-"):
+        deploy = "deploy9"
+        deploy_target = target.replace("runtime-", "runtimes-")
+    elif target.startswith("intel-runtime-"):
+        deploy = "deploy9"
+        deploy_target = target.replace("intel-runtime-", "intel-runtimes-")
+    elif target.startswith("rstudio-"):
         deploy = "deploy"
         os = re.match(r"^rstudio-([^-]+-).*", target)
         deploy_target = os.group(1) + target
-    elif target.startswith("runtime-"):
-        deploy = "deploy9"
-        deploy_target = target.replace("runtime-", "runtimes-")
     else:
         deploy = "deploy9"
         deploy_target = target
@@ -53,7 +56,7 @@ def run_tests(target: str) -> None:
 
     check_call(f"make {deploy}-{deploy_target}", shell=True)
     try:
-        if target.startswith("runtime-"):
+        if target.startswith("runtime-") or target.startswith("intel-runtime-"):
             check_call(f"make validate-runtime-image image={target}", shell=True)
         elif target.startswith("rstudio-"):
             check_call(f"make validate-rstudio-image image={target}", shell=True)
@@ -138,6 +141,15 @@ class TestMakeTest(unittest.TestCase):
         assert "make deploy9-runtimes-datascience-ubi9-python-3.11" in commands
         assert "make validate-runtime-image image=runtime-datascience-ubi9-python-3.11" in commands
         assert "make undeploy9-runtimes-datascience-ubi9-python-3.11" in commands
+
+    @unittest.mock.patch("make_test.execute")
+    def test_make_commands_intel_runtime(self, mock_execute: unittest.mock.Mock) -> None:
+        """Compares the commands with what we had in the openshift/release yaml"""
+        run_tests("intel-runtime-ml-ubi9-python-3.11")
+        commands: list[str] = [c[0][1][0] for c in mock_execute.call_args_list]
+        assert "make deploy9-intel-runtimes-ml-ubi9-python-3.11" in commands
+        assert "make validate-runtime-image image=intel-runtime-ml-ubi9-python-3.11" in commands
+        assert "make undeploy9-intel-runtimes-ml-ubi9-python-3.11" in commands
 
 if __name__ == "__main__":
     main()
