@@ -195,6 +195,9 @@ jobs:
           # this is where cri-o gets its storage defaults (that can be overriden in crio.conf.d/
           sudo cp ci/cached-builds/storage.conf /etc/containers/storage.conf
           sudo cp ci/cached-builds/registries.conf /etc/containers/registries.conf
+          # https://unix.stackexchange.com/questions/17402/why-does-root-get-permission-denied-when-accessing-fuse-directory
+          # fix for: processing tar file(lsetxattr /dev/console: operation not permitted)
+          sudo cp ci/cached-builds/fuse.conf /etc/fuse.conf
           
           sudo systemctl start crio.service
         env:
