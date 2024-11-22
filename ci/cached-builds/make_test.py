@@ -55,6 +55,7 @@ def run_tests(target: str) -> None:
     check_call(f"timeout 10s bash -c 'until kubectl get serviceaccount/default; do sleep 1; done'", shell=True)
 
     check_call(f"make {deploy}-{deploy_target}", shell=True)
+    wait_for_stability(pod)
     try:
         if target.startswith("runtime-") or target.startswith("intel-runtime-"):
             check_call(f"make validate-runtime-image image={target}", shell=True)
@@ -104,6 +105,13 @@ def execute(executor: typing.Callable, args: tuple, kwargs: dict) -> int:
     sys.stdout.flush()
     return result
 
+
+def wait_for_stability(pod: str) -> None:
+    """Waits for the pod to be stable. Often I'm seeing that the probes initially fail.
+    > error: Internal error occurred: error executing command in container: container is not created or running
+    > error: unable to upgrade connection: container not found ("notebook")
+    """
+    call(f"timeout 60s bash -c 'until kubectl wait --for=condition=running pod/{pod} --timeout 5s; sleep 1; done'", shell=True)
 
 class TestMakeTest(unittest.TestCase):
     @unittest.mock.patch("make_test.execute")
