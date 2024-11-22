@@ -111,8 +111,9 @@ jobs:
 
           # https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md
           # since `brew services start podman` is buggy, let's do our own brew-compatible service
-          sudo cp ci/cached-builds/podman.service /etc/systemd/system/podman.service
-          sudo cp ci/cached-builds/podman.socket /etc/systemd/system/podman.socket
+          # Regarding directory paths, see https://unix.stackexchange.com/questions/224992/where-do-i-put-my-systemd-unit-file
+          sudo cp ci/cached-builds/podman.service /usr/local/lib/systemd/system/podman.service
+          sudo cp ci/cached-builds/podman.socket /usr/local/lib/systemd/system/podman.socket
           sudo systemctl daemon-reload
           sudo systemctl start podman.socket
 
