@@ -280,6 +280,7 @@ jobs:
           kubectl describe deployments --namespace kyverno
           # deployments don't tell me why pods are failing
           kubectl describe pods --namespace kyverno
+          kubectl logs deployments/kyverno-admission-controller --namespace kyverno
 
       - name: Show nodes status and wait for readiness
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
