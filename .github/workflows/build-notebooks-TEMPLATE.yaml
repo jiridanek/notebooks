@@ -373,7 +373,7 @@ jobs:
           EOF
         working-directory: tests/browser
         env:
-          TEST_TARGET: "ghcr.io/${{ github.repository }}/workbench-images:${{ inputs.target }}-${{ github.sha }}"
+          TEST_TARGET: "${{ steps.calculated_vars.outputs.OUTPUT_IMAGE }}"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && fromJson(inputs.github).event_name == 'pull_request' && contains(inputs.target, 'codeserver') }}
         with:
