@@ -303,6 +303,9 @@ jobs:
 
           sudo sysctl -w net.ipv4.ip_forward=1
 
+          # well, yeah, but it works!
+          sudo ufw disable
+
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
 
