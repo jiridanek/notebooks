@@ -1,0 +1,29 @@
+# cat /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+# https://github.com/containerd/containerd/blob/main/script%2Fsetup%2Finstall-cni
+# https://www.cni.dev/plugins/current/main/bridge/
+{
+  "cniVersion": "1.0.0",
+  "name": "crio",
+  "plugins": [
+    {
+      "type": "bridge",
+      "bridge": "cni0",
+      "isGateway": true,
+      "ipMasq": true,
+      "promiscMode": true,
+      "ipam": {
+        "type": "host-local",
+        "routes": [
+            { "dst": "0.0.0.0/0" }
+        ],
+        "ranges": [
+            [{ "subnet": "10.85.0.0/16" }]
+        ]
+      }
+    },
+    {
+      "type": "portmap",
+      "capabilities": {"portMappings": true}
+    }
+  ]
+}
