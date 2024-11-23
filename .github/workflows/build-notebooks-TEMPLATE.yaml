@@ -240,6 +240,7 @@ jobs:
           cat /etc/resolv.conf
 
           sudo cp ci/cached-builds/resolv.conf /etc/resolv.conf
+          nslookup github.com
           nslookup raw.githubusercontent.com
 
       # https://cri-o.io/
