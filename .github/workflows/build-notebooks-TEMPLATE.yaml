@@ -349,7 +349,7 @@ jobs:
           sleep 15
           kubectl logs --namespace=kube-system deployment/coredns
           kubectl get --namespace=kube-system configmap/coredns -o yaml
-          
+
           cat /run/systemd/resolve/resolv.conf
           cat /var/lib/kubelet/kubeadm-flags.env
           cat /var/lib/kubelet/config.yaml
