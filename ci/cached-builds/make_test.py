@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
 import functools
 import re
 import subprocess
@@ -86,22 +87,25 @@ def run_tests(target: str) -> None:
             check_call(f"make test-{target}", shell=True)
     finally:
         # dump a lot of info to the GHA logs
+        with gha_log_group("pod and statefulset info"):
+            call(f"kubectl get statefulsets", shell=True)
+            call(f"kubectl describe statefulsets", shell=True)
+            call(f"kubectl get pods", shell=True)
+            call(f"kubectl describe pods", shell=True)
+            # describe does not show everything about the pod
+            call(f"kubectl get pods -o yaml", shell=True)
 
-        call(f"kubectl get statefulsets", shell=True)
-        call(f"kubectl describe statefulsets", shell=True)
-        call(f"kubectl get pods", shell=True)
-        call(f"kubectl describe pods", shell=True)
-        # describe does not show everything about the pod
-        call(f"kubectl get pods -o yaml", shell=True)
+        with gha_log_group("kubernetes namespace events"):
+            # events aren't all that useful, but it can tell what was happening in the current namespace
+            call(f"kubectl get events", shell=True)
 
-        # events aren't all that useful, but it can tell what was happening in the current namespace
-        call(f"kubectl get events", shell=True)
-
-        # relevant if the pod is crashlooping, this shows the final lines
-        # use the negative label selector as a trick to match all pods (as we don't have any pods with nosuchlabel)
-        call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps --previous", shell=True)
-        # regular logs from a running (or finished) pod
-        call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps", shell=True)
+        with gha_log_group("previous pod logs"):
+            # relevant if the pod is crashlooping, this shows the final lines
+            # use the negative label selector as a trick to match all pods (as we don't have any pods with nosuchlabel)
+            call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps --previous", shell=True)
+        with gha_log_group("current pod logs"):
+            # regular logs from a running (or finished) pod
+            call(f"kubectl logs --selector=nosuchlabel!=nosuchvalue --all-pods --timestamps", shell=True)
 
     check_call(f"make un{deploy}-{deploy_target}", shell=True)
 
@@ -139,6 +143,19 @@ def wait_for_stability(pod: str) -> None:
             f"timeout {timeout}s bash -c 'until kubectl wait --for=condition=Ready pods --all --timeout 5s; do sleep 1; done'", shell=True)
         timeout = 50
         time.sleep(3)
+
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#grouping-log-lines
+@contextlib.contextmanager
+def gha_log_group(title):
+    """Prints the starting and ending magic strings for GitHub Actions line group in log."""
+    print(f"::group::{title}", file=sys.stdout)
+    sys.stdout.flush()
+    try:
+        yield
+    finally:
+        print("::endgroup::", file=sys.stdout)
+        sys.stdout.flush()
 
 
 # https://docs.python.org/3/library/unittest.mock-examples.html#patch-decorators
