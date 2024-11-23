@@ -291,6 +291,7 @@ jobs:
 
           sudo swapoff -a
           sudo modprobe br_netfilter
+          sudo sysctl -w net.ipv4.ip_forward=1
 
           # Was getting strange DNS resolution errors from pods that don't seem to want to go away sometimes:
           #  Resolving raw.githubusercontent.com (raw.githubusercontent.com)... failed: Name or service not known.
@@ -298,10 +299,7 @@ jobs:
           # Here's what helped:
           #  https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/#known-issues
           #  https://github.com/kubernetes/kubernetes/blob/e4c1f980b76fecece30c2f77885a7117192170a6/CHANGELOG/CHANGELOG-1.30.md?plain=1#L1454
-          sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
-          sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
-
-          sudo sysctl -w net.ipv4.ip_forward=1
+          sudo ufw reload
 
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
