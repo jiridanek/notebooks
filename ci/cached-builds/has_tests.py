@@ -13,6 +13,7 @@ import gha_pr_changed_files
 https://github.com/openshift/release/blob/master/ci-operator/config/opendatahub-io/notebooks/opendatahub-io-notebooks-main.yaml#L1485
 """
 
+
 class Args(argparse.Namespace):
     """Type annotation to have autocompletion for args"""
     target: str
@@ -33,6 +34,11 @@ def main() -> None:
 
 
 def check_tests(target: str) -> bool:
+    if target.startswith("rocm-jupyter-minimal-"):
+        return False  # we don't have specific tests for -minimal- in ci-operator/config
+    if '-intel-' in target:
+        return False  # RHOAIENG-8388: Intel tensorflow notebook failed to get tested on OCP-CI
+
     has_tests = False
     dirs = gha_pr_changed_files.analyze_build_directories(target)
     for d in reversed(dirs):  # (!)
