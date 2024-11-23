@@ -224,10 +224,23 @@ jobs:
       # Deploying notebook from runtimes/rocm/tensorflow/ubi9-python-3.11/kustomize/base directory...
       # sed: can't read runtimes/rocm/tensorflow/ubi9-python-3.11/kustomize/base/kustomization.yaml: No such file or directory
       - name: "Fixup paths that prevent us from running rocm tests"
+        if: ${{ steps.have-tests.outputs.tests == 'true' }}
         run: |
+          set -Eeuxo pipefail
+
           mkdir -p runtimes/rocm
           ln -s ../rocm-tensorflow runtimes/rocm/tensorflow
           ln -s ../rocm-pytorch runtimes/rocm/pytorch
+
+      - name: Set public DNS
+        if: ${{ steps.have-tests.outputs.tests == 'true' }}
+        run: |
+          set -Eeuxo pipefail
+
+          cat /etc/resolv.conf
+
+          sudo cp ci/cached-builds/resolv.conf /etc/resolv.conf
+          nslookup raw.githubusercontent.com
 
       # https://cri-o.io/
       - name: Install cri-o
