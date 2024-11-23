@@ -299,7 +299,10 @@ jobs:
           # Here's what helped:
           #  https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/#known-issues
           #  https://github.com/kubernetes/kubernetes/blob/e4c1f980b76fecece30c2f77885a7117192170a6/CHANGELOG/CHANGELOG-1.30.md?plain=1#L1454
-          sudo ufw disable
+          #  https://github.com/canonical/microk8s/issues/68#issuecomment-404923563
+          sudo ufw allow in on cni0
+          sudo ufw allow out on cni0
+          sudo ufw default allow routed
 
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
