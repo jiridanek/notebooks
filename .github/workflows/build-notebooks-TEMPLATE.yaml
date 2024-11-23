@@ -299,7 +299,7 @@ jobs:
           # Here's what helped:
           #  https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/#known-issues
           #  https://github.com/kubernetes/kubernetes/blob/e4c1f980b76fecece30c2f77885a7117192170a6/CHANGELOG/CHANGELOG-1.30.md?plain=1#L1454
-          sudo ufw reload
+          sudo ufw disable
 
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
