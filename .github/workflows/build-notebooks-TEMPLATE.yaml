@@ -256,6 +256,9 @@ jobs:
           # meke use of /etc/cni/net.d/11-crio-ipv4-bridge.conflist so we don't
           # need a pod network and just use the default bridge
           sudo rm -rf /etc/cni/net.d/*
+          # cat /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+          # https://github.com/containerd/containerd/blob/main/script%2Fsetup%2Finstall-cni
+          # https://www.cni.dev/plugins/current/main/bridge/
           sudo cp ci/cached-builds/11-crio-ipv4-bridge.conflist /etc/cni/net.d/11-crio-ipv4-bridge.conflist
 
           sudo cp ci/cached-builds/crio.conf /etc/crio/crio.conf.d/
