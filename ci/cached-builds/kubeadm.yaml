@@ -40,6 +40,6 @@ imageRepository: registry.k8s.io
 kind: ClusterConfiguration
 networking:
   dnsDomain: cluster.local
-  # this matches the default in the flannel yaml (--pod-network-cidr=10.244.0.0/16)
-  podSubnet: 10.244.0.0/16
+  # this matches the default in /etc/cni/net.d/11-crio-ipv4-bridge.conflist
+  podSubnet: 10.85.0.0/16
 scheduler: {}
