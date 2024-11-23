@@ -307,6 +307,8 @@ jobs:
           sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
           sudo sysctl -w net.ipv4.ip_forward=1
 
+          sudo ufw disable
+
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
 
