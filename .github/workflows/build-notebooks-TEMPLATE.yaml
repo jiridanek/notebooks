@@ -304,6 +304,7 @@ jobs:
           sudo ufw allow out on cni0
           sudo ufw default allow routed
           sudo iptables -P FORWARD ACCEPT
+          sudo iptables -A POSTROUTING -s 10.85.0.0/16 -o eth0 -j MASQUERADE
 
           # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm
           sudo kubeadm init --config=ci/cached-builds/kubeadm.yaml
