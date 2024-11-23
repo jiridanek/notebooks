@@ -295,11 +295,6 @@ jobs:
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: sudo crictl images
 
-      - name: ufw status
-        run: |
-          sudo ufw status
-          sudo ufw status verbose
-
       - name: Install Kubernetes cluster
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
