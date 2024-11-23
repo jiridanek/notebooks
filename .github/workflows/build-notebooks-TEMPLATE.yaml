@@ -358,9 +358,9 @@ jobs:
             --env "CI=true" \
             --env "NPM_CONFIG_fund=false" \
             --env "DEBUG=testcontainers:*" \
-            --env "PODMAN_SOCK=unix://${PODMAN_SOCK}" \
+            --env "PODMAN_SOCK=/var/run/docker.sock" \
             --env "TEST_TARGET" \
-            --volume ${PODMAN_SOCK}:${PODMAN_SOCK} \
+            --volume ${PODMAN_SOCK}:/var/run/docker.sock \
             --volume ${PWD}:/mnt \
             --volume /mnt/node_modules \
             mcr.microsoft.com/playwright:v1.48.1-noble \
