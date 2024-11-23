@@ -342,6 +342,7 @@ jobs:
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
       - name: "Debug DNS"
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
         run: |
           set -Eeuxo pipefail
 
