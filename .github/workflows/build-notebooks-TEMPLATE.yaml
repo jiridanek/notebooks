@@ -348,10 +348,14 @@ jobs:
 
           kubectl logs --namespace=kube-system deployment/coredns
           kubectl get --namespace=kube-system configmap/coredns -o yaml
+          
+          cat /run/systemd/resolve/resolv.conf
+          cat /var/lib/kubelet/kubeadm-flags.env
+          cat /var/lib/kubelet/config.yaml
           #kubectl -n kube-system rollout restart deployment coredns
           #kubectl -n kube-system edit configmaps coredns -o yaml
-          #firewall-cmd --add-masquerade --permanent
-          #firewall-cmd --reload
+          sudo firewall-cmd --add-masquerade --permanent
+          sudo firewall-cmd --reload
 
       - name: "Run image tests"
         if: ${{ steps.have-tests.outputs.tests == 'true'  }}
