@@ -343,6 +343,23 @@ jobs:
           kubectl wait deployments --all --all-namespaces --for=condition=Available --timeout=100s
           kubectl wait pods --all --all-namespaces --for=condition=Ready --timeout=100s
 
+      - name: "Debug DNS"
+        if: ${{ steps.have-tests.outputs.tests == 'true'  }}
+        run: |
+          set -Eeuxo pipefail
+
+          #sleep 15
+          kubectl logs --namespace=kube-system deployment/coredns
+          kubectl get --namespace=kube-system configmap/coredns -o yaml
+
+          #cat /run/systemd/resolve/resolv.conf
+          #cat /var/lib/kubelet/kubeadm-flags.env
+          #cat /var/lib/kubelet/config.yaml
+          #kubectl -n kube-system rollout restart deployment coredns
+          #kubectl -n kube-system edit configmaps coredns -o yaml
+          #sudo firewall-cmd --add-masquerade --permanent
+          #sudo firewall-cmd --reload
+
       - name: "Run image tests"
         if: ${{ steps.have-tests.outputs.tests == 'true' }}
         run: python3 ci/cached-builds/make_test.py --target ${{ inputs.target }}
