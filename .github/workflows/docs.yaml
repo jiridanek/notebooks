@@ -57,4 +57,5 @@ jobs:
 
       - name: Run the release notes script
         run: |
+          set -Eeuxo pipefail
           ci/package_versions.py | tee ${GITHUB_STEP_SUMMARY}
