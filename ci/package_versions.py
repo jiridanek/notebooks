@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import yaml
 
 import package_versions_selftestdata
 
-"""Generates the workbench software listings for https://access.redhat.com/articles/rhoai-supported-configs 
+"""Generates the workbench software listings for https://access.redhat.com/articles/rhoai-supported-configs
 using the Markdown variant described at https://access.redhat.com/articles/7056942"""
 
 ROOT_DIR = pathlib.Path(__file__).parent.parent
