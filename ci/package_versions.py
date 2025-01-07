@@ -87,7 +87,8 @@ def main():
     print('Image name | Image version | Preinstalled packages')
     print('--------- | ---------')
 
-    # for imagestream in sorted(imagestreams, key=lambda imagestream: imagestream.order):
+    # todo(jdanek): maybe we want to change to sorting by `imagestream.order`
+    #  for imagestream in sorted(imagestreams, key=lambda imagestream: imagestream.order):
     for imagestream in sorted(imagestreams, key=lambda imagestream: imagestream.name):
         name = imagestream.name
 
