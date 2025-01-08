@@ -58,4 +58,10 @@ jobs:
       - name: Run the release notes script
         run: |
           set -Eeuxo pipefail
-          poetry run ci/package_versions.py | tee ${GITHUB_STEP_SUMMARY}
+          poetry run ci/package_versions.py | tee packages_report.md
+
+          cat packages_report.md >> ${GITHUB_STEP_SUMMARY}
+          echo '### Sources' >> ${GITHUB_STEP_SUMMARY}
+          echo '```' >> ${GITHUB_STEP_SUMMARY}
+          cat packages_report.md >> ${GITHUB_STEP_SUMMARY}
+          echo '```' >> ${GITHUB_STEP_SUMMARY}
