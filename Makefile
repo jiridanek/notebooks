@@ -106,6 +106,18 @@ define image
 	)
 endef
 
+define runtime_image
+	$(info #*# Image build directory: <$(2)> #(MACHINE-PARSED LINE)#*#...)
+
+	$(if $(or $(BUILD_DEPENDENT_IMAGES:no=), $(filter $@,$(MAKECMDGOALS))),
+		$(call build_image,$(1),.,$(2),$(3))
+
+		$(if $(PUSH_IMAGES:no=),
+			$(call push_image,$(1))
+		)
+	)
+endef
+
 #######################################        Build helpers                 #######################################
 
 # https://stackoverflow.com/questions/78899903/how-to-create-a-make-target-which-is-an-implicit-dependency-for-all-other-target
@@ -168,22 +180,22 @@ jupyter-trustyai-ubi9-python-3.11: jupyter-datascience-ubi9-python-3.11
 # Build and push runtime-minimal-ubi9-python-3.11 image to the registry
 .PHONY: runtime-minimal-ubi9-python-3.11
 runtime-minimal-ubi9-python-3.11: base-ubi9-python-3.11
-	$(call image,$@,runtimes/minimal/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/minimal/ubi9-python-3.11,$<)
 
 # Build and push runtime-datascience-ubi9-python-3.11 image to the registry
 .PHONY: runtime-datascience-ubi9-python-3.11
 runtime-datascience-ubi9-python-3.11: base-ubi9-python-3.11
-	$(call image,$@,runtimes/datascience/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/datascience/ubi9-python-3.11,$<)
 
 # Build and push runtime-pytorch-ubi9-python-3.11 image to the registry
 .PHONY: runtime-pytorch-ubi9-python-3.11
 runtime-pytorch-ubi9-python-3.11: base-ubi9-python-3.11
-	$(call image,$@,runtimes/pytorch/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/pytorch/ubi9-python-3.11,$<)
 
 # Build and push runtime-cuda-tensorflow-ubi9-python-3.11 image to the registry
 .PHONY: runtime-cuda-tensorflow-ubi9-python-3.11
 runtime-cuda-tensorflow-ubi9-python-3.11: cuda-ubi9-python-3.11
-	$(call image,$@,runtimes/tensorflow/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/tensorflow/ubi9-python-3.11,$<)
 
 .PHONY: codeserver-ubi9-python-3.11
 codeserver-ubi9-python-3.11: base-ubi9-python-3.11
@@ -236,12 +248,12 @@ rocm-jupyter-pytorch-ubi9-python-3.11: rocm-jupyter-datascience-ubi9-python-3.11
 # Build and push rocm-jupyter-runtime-pytorch-ubi9-python-3.11 image to the registry
 .PHONY: rocm-runtime-pytorch-ubi9-python-3.11
 rocm-runtime-pytorch-ubi9-python-3.11: rocm-ubi9-python-3.11
-	$(call image,$@,runtimes/rocm-pytorch/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/rocm-pytorch/ubi9-python-3.11,$<)
 
 # Build and push rocm-jupyter-runtime-tensorflow-ubi9-python-3.11 image to the registry
 .PHONY: rocm-runtime-tensorflow-ubi9-python-3.11
 rocm-runtime-tensorflow-ubi9-python-3.11: rocm-ubi9-python-3.11
-	$(call image,$@,runtimes/rocm-tensorflow/ubi9-python-3.11,$<)
+	$(call runtime_image,$@,runtimes/rocm-tensorflow/ubi9-python-3.11,$<)
 
 ####################################### Deployments #######################################
 
