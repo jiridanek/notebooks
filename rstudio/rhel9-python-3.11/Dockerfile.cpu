@@ -3,6 +3,8 @@
 #####################
 FROM registry.redhat.io/rhel9/python-311:latest AS base
 
+RUN touch base
+
 WORKDIR /opt/app-root/bin
 
 # Install micropipenv to deploy packages from Pipfile.lock
