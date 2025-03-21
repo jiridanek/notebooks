@@ -5,10 +5,10 @@ metadata:
   labels:
     opendatahub.io/notebook-image: "true"
   annotations:
-    opendatahub.io/notebook-image-url: "https://github.com/opendatahub-io/notebooks/blob/main/jupyter/rocm/pytorch"
+    opendatahub.io/notebook-image-url: "https://github.com/red-hat-data-services/notebooks/blob/main/jupyter/rocm/pytorch"
     opendatahub.io/notebook-image-name: "ROCm-PyTorch"
     opendatahub.io/notebook-image-desc: "Jupyter ROCm optimized PyTorch notebook image for ODH notebooks."
-    opendatahub.io/notebook-image-order: "12"
+    opendatahub.io/notebook-image-order: "91"
     opendatahub.io/recommended-accelerators: '["amd.com/gpu"]'
   name: jupyter-rocm-pytorch
 spec:
@@ -44,7 +44,7 @@ spec:
             {"name": "MySQL Connector/Python", "version": "9.2"},
             {"name": "Kubeflow-Training", "version": "1.9"}
           ]
-        openshift.io/imported-from: quay.io/opendatahub/workbench-images
+        openshift.io/imported-from: quay.io/modh/rocm-notebooks
         opendatahub.io/workbench-image-recommended: 'true'
         opendatahub.io/notebook-build-commit: $(odh-rocm-pytorch-notebook-image-commit-n)
       from:
@@ -53,7 +53,7 @@ spec:
       name: "2025.1"
       referencePolicy:
         type: Source
-    # N-1 Version of the image
+    # N - 1 Version of the image
     - annotations:
         # language=json
         opendatahub.io/notebook-software: |
@@ -82,7 +82,7 @@ spec:
             {"name": "MySQL Connector/Python", "version": "9.0"},
             {"name": "Kubeflow-Training", "version": "1.8"}
           ]
-        openshift.io/imported-from: quay.io/opendatahub/workbench-images
+        openshift.io/imported-from: quay.io/modh/rocm-notebooks
         opendatahub.io/workbench-image-recommended: 'false'
         opendatahub.io/notebook-build-commit: $(odh-rocm-pytorch-notebook-image-commit-n-1)
       from:
