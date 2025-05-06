@@ -4,6 +4,7 @@ import allure
 import pytest
 import requests
 
+
 from tests.containers import conftest, docker_utils
 from tests.containers.workbenches.workbench_image_test import WorkbenchContainer
 
@@ -66,3 +67,17 @@ class TestJupyterLabImage:
             docker_utils.container_exec(container.get_wrapped_container(), "mongocli config --help")
         finally:
             docker_utils.NotebookContainer(container).stop(timeout=0)  # if no env is specified, the image will run
+
+    @allure.issue("RHOAIENG-16568")
+    @allure.description("Check that PDF export is working correctly")
+    def test_pdf_export(self, jupyterlab_image: docker.models.images.Image) -> None:
+        container = WorkbenchContainer(image=jupyterlab_image, user=4321, group_add=[0])
+        try:
+            test_notebook = "test.ipynb"
+            container.start(wait_for_readiness=True)
+            docker_utils.container_cp(container.get_wrapped_container(), test_notebook, self.APP_ROOT_HOME)
+            exit_code, convert_output = container.exec(["jupyter", "nbconvert", test_notebook, "--to", "pdf"])
+            assert "PDF successfully created" in convert_output.decode()
+            assert 0 == exit_code
+        finally:
+            docker_utils.NotebookContainer(container).stop(timeout=0)
