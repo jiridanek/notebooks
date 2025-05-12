@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "types": [
+      "cypress",
+      "@testing-library/cypress"
+    ]
+  }
+}
