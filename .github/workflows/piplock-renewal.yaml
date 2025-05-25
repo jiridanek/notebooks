@@ -64,7 +64,7 @@ jobs:
       - name: Install pipenv
         # starting in 3.12, setuptools is not installed by default, `pipenv lock` may fail with
         #  pipenv.patched.pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta'
-        run: pip install pipenv setuptools
+        run: pip install pipenv setuptools wheel
 
       # Run makefile recipe to refresh Pipfile.lock and push changes back to the branch
       - name: Run make refresh-pipfilelock-files and push the changes back to the branch
