@@ -7,4 +7,4 @@ resources:
 images:
   - name: rstudio-workbench
     newName: quay.io/opendatahub/workbench-images
-    newTag: rstudio-c9s-python-3.11
+    newTag: rstudio-c9s-python-3.12

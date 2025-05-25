@@ -20,7 +20,7 @@ spec:
           [
             {"name":"CUDA","version":"12.4"},
             {"name":"R","version":"v4.4"},
-            {"name":"Python","version":"v3.11"}
+            {"name":"Python","version":"v3.12"}
           ]
         # language=json
         opendatahub.io/notebook-python-dependencies: |
@@ -46,7 +46,7 @@ spec:
   strategy:
     type: Docker
     dockerStrategy:
-      dockerfilePath: "rstudio/rhel9-python-3.11/Dockerfile.cuda"
+      dockerfilePath: "rstudio/rhel9-python-3.12/Dockerfile.cuda"
       noCache: true
       volumes:
         - name: secret-mvn

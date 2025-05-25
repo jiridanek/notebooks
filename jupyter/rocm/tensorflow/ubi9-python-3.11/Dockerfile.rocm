@@ -44,7 +44,7 @@ FROM base AS rocm-base
 USER 0
 WORKDIR /opt/app-root/bin
 
-# Please keep in sync with ROCm/python3.11 dependent images
+# Please keep in sync with ROCm/python3.12 dependent images
 ARG ROCM_VERSION=6.2.4
 ARG AMDGPU_VERSION=6.2.4
 
@@ -76,7 +76,7 @@ WORKDIR /opt/app-root/src
 FROM rocm-base AS rocm-jupyter-minimal
 
 ARG JUPYTER_REUSABLE_UTILS=jupyter/utils
-ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.11
+ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -93,7 +93,7 @@ ENTRYPOINT ["start-notebook.sh"]
 ############################
 FROM rocm-jupyter-minimal AS rocm-jupyter-datascience
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -127,20 +127,20 @@ WORKDIR /opt/app-root/src
 ###########################
 FROM rocm-jupyter-datascience AS rocm-jupyter-tensorflow
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
-ARG TENSORFLOW_SOURCE_CODE=jupyter/rocm/tensorflow/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
+ARG TENSORFLOW_SOURCE_CODE=jupyter/rocm/tensorflow/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
-LABEL name="odh-notebook-jupyter-rocm-tensorflow-ubi9-python-3.11" \
+LABEL name="odh-notebook-jupyter-rocm-tensorflow-ubi9-python-3.12" \
     summary="Jupyter AMD tensorflow notebook image for ODH notebooks" \
-    description="Jupyter AMD tensorflow notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    description="Jupyter AMD tensorflow notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Jupyter AMD tensorflow notebook image for ODH notebooks" \
-    io.k8s.description="Jupyter AMD tensorflow notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    io.k8s.description="Jupyter AMD tensorflow notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
     io.openshift.build.commit.ref="main" \
-    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/rocm/tensorflow/ubi9-python-3.11" \
-    io.openshift.build.image="quay.io/opendatahub/workbench-images:rocm-jupyter-tensorflow-ubi9-python-3.11"
+    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/rocm/tensorflow/ubi9-python-3.12" \
+    io.openshift.build.image="quay.io/opendatahub/workbench-images:rocm-jupyter-tensorflow-ubi9-python-3.12"
 
 COPY ${TENSORFLOW_SOURCE_CODE}/Pipfile.lock  ./
 
@@ -158,7 +158,7 @@ RUN echo "Installing softwares and packages" && \
     # Apply JupyterLab addons \
     /opt/app-root/bin/utils/addons/apply.sh && \
     # Fix permissions to support pip in Openshift environments \
-    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
+    chmod -R g+w /opt/app-root/lib/python3.12/site-packages && \
     fix-permissions /opt/app-root -P
 
 WORKDIR /opt/app-root/src

@@ -135,7 +135,7 @@ RUN yum install -y \
     ${NV_CUDNN_PACKAGE_DEV} \
     && yum clean all \
     && rm -rf /var/cache/yum/*
-    
+
 # Set this flag so that libraries can find the location of CUDA
 ENV XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/local/cuda
 
@@ -146,20 +146,20 @@ WORKDIR /opt/app-root/src
 #########################
 # cuda-jupyter-minimal  #
 #########################
-FROM cuda-base AS cuda-jupyter-minimal  
+FROM cuda-base AS cuda-jupyter-minimal
 
 ARG JUPYTER_REUSABLE_UTILS=jupyter/utils
-ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.11
+ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.12
 
-LABEL name="odh-notebook-jupyter-cuda-minimal-ubi9-python-3.11" \
+LABEL name="odh-notebook-jupyter-cuda-minimal-ubi9-python-3.12" \
     summary="Minimal Jupyter CUDA notebook image for ODH notebooks" \
-    description="Minimal Jupyter CUDA notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    description="Minimal Jupyter CUDA notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Minimal Jupyter CUDA notebook image for ODH notebooks" \
-    io.k8s.description="Minimal Jupyter CUDA notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    io.k8s.description="Minimal Jupyter CUDA notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
     io.openshift.build.commit.ref="main" \
-    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/minimal/ubi9-python-3.11" \
-    io.openshift.build.image="quay.io/opendatahub/workbench-images:cuda-jupyter-minimal-ubi9-python-3.11"
+    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/minimal/ubi9-python-3.12" \
+    io.openshift.build.image="quay.io/opendatahub/workbench-images:cuda-jupyter-minimal-ubi9-python-3.12"
 
 WORKDIR /opt/app-root/bin
 
@@ -176,11 +176,11 @@ RUN echo "Installing softwares and packages" && \
     # Replace Notebook's launcher, "(ipykernel)" with Python's version 3.x.y \
     sed -i -e "s/Python.*/$(python --version | cut -d '.' -f-2)\",/" /opt/app-root/share/jupyter/kernels/python3/kernel.json && \
     # Fix permissions to support pip in Openshift environments \
-    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
+    chmod -R g+w /opt/app-root/lib/python3.12/site-packages && \
     fix-permissions /opt/app-root -P && \
     # Apply JupyterLab addons \
     /opt/app-root/bin/utils/addons/apply.sh
-    
+
 WORKDIR /opt/app-root/src
 
 ENTRYPOINT ["start-notebook.sh"]

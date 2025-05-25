@@ -136,7 +136,7 @@ if [[ "$REPO_OWNER" == "opendatahub-io" ]]; then
         if [[ $src_tag == jupyter-pytorch* ]]; then
            src_tag="cuda-$src_tag"
         fi
-        # This should match like for ex: jupyter-minimal-ubi9-python-3.11-20250310-60b6ecc tag name as is on quay.io registry
+        # This should match like for ex: jupyter-minimal-ubi9-python-3.12-20250310-60b6ecc tag name as is on quay.io registry
         regex="^$src_tag-[0-9]{8}-$HASH$"
         latest_tag=$(echo "${skopeo_metadata}" | jq -r --arg regex "$regex" '.RepoTags | map(select(. | test($regex))) | .[0]')
 
@@ -171,15 +171,15 @@ elif [[ "$REPO_OWNER" == "red-hat-data-services" ]]; then
     IMAGES=$(grep "\-n=" "${PARAMS_ENV_PATH}" | cut -d "=" -f 1)
     # The order of the regexes array should match with the params.env file
     REGEXES=("^v3-[0-9]{8}-$HASH$" \
-              "^cuda-[a-z]+-minimal-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$" \
+              "^cuda-[a-z]+-minimal-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$" \
               "^v3-[0-9]{8}-$HASH$" \
               "^v3-[0-9]{8}-$HASH$" \
-              "^cuda-[a-z]+-tensorflow-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$" \
+              "^cuda-[a-z]+-tensorflow-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$" \
               "^v3-[0-9]{8}-$HASH$" \
-              "^codeserver-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$" \
-              "^rocm-[a-z]+-minimal-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$" \
-              "^rocm-[a-z]+-pytorch-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$" \
-              "^rocm-[a-z]+-tensorflow-[a-z0-9]+-[a-z]+-3.11-[0-9]{8}-$HASH$")
+              "^codeserver-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$" \
+              "^rocm-[a-z]+-minimal-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$" \
+              "^rocm-[a-z]+-pytorch-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$" \
+              "^rocm-[a-z]+-tensorflow-[a-z0-9]+-[a-z]+-$PYTHON_VERSION-[0-9]{8}-$HASH$")
     i=0
     for image in ${IMAGES}; do
         echo "CHECKING: '${image}'"

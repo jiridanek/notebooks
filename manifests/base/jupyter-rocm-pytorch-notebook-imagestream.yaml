@@ -20,7 +20,7 @@ spec:
         # language=json
         opendatahub.io/notebook-software: |
           [
-            {"name": "Python", "version": "v3.11"},
+            {"name": "Python", "version": "v3.12"},
             {"name": "ROCm-PyTorch", "version": "2.6"}
           ]
         # language=json
@@ -58,7 +58,7 @@ spec:
         # language=json
         opendatahub.io/notebook-software: |
           [
-            {"name": "Python", "version": "v3.11"},
+            {"name": "Python", "version": "v3.12"},
             {"name": "ROCm-PyTorch", "version": "2.4"}
           ]
         # language=json

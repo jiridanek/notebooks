@@ -178,7 +178,7 @@ class TestManifest(unittest.TestCase):
         assert self.manifest.tags[0].recommended is True
 
     def test_tag_sw_general(self):
-        assert self.manifest.tags[0].sw_general == [{"name": "Python", "version": "v3.11"}]
+        assert self.manifest.tags[0].sw_general == [{"name": "Python", "version": "v3.12"}]
 
     def test_tag_sw_python(self):
         assert self.manifest.tags[0].sw_python == [{"name": "JupyterLab", "version": "4.2"}]

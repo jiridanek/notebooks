@@ -42,7 +42,7 @@ RUN curl -L https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/oc
 FROM base AS jupyter-minimal
 
 ARG JUPYTER_REUSABLE_UTILS=jupyter/utils
-ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.11
+ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -59,7 +59,7 @@ ENTRYPOINT ["start-notebook.sh"]
 ########################
 FROM jupyter-minimal AS jupyter-datascience
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -92,18 +92,18 @@ WORKDIR /opt/app-root/src
 ####################
 FROM jupyter-datascience AS jupyter-trustyai
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
-ARG TRUSTYAI_SOURCE_CODE=jupyter/trustyai/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
+ARG TRUSTYAI_SOURCE_CODE=jupyter/trustyai/ubi9-python-3.12
 
-LABEL name="odh-notebook-jupyter-trustyai-ubi9-python-3.11" \
+LABEL name="odh-notebook-jupyter-trustyai-ubi9-python-3.12" \
     summary="Jupyter trustyai notebook image for ODH notebooks" \
-    description="Jupyter trustyai notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    description="Jupyter trustyai notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Jupyter trustyai notebook image for ODH notebooks" \
-    io.k8s.description="Jupyter trustyai notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    io.k8s.description="Jupyter trustyai notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
     io.openshift.build.commit.ref="main" \
-    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/trustyai/ubi9-python-3.11" \
-    io.openshift.build.image="quay.io/opendatahub/workbench-images:jupyter-trustyai-ubi9-python-3.11"
+    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/trustyai/ubi9-python-3.12" \
+    io.openshift.build.image="quay.io/opendatahub/workbench-images:jupyter-trustyai-ubi9-python-3.12"
 
 USER 0
 
@@ -131,5 +131,5 @@ RUN echo "Installing softwares and packages" && \
     # Apply JupyterLab addons \
     /opt/app-root/bin/utils/addons/apply.sh && \
     # Fix permissions to support pip in Openshift environments \
-    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
+    chmod -R g+w /opt/app-root/lib/python3.12/site-packages && \
     fix-permissions /opt/app-root -P

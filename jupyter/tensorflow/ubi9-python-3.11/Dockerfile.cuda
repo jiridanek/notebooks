@@ -162,7 +162,7 @@ WORKDIR /opt/app-root/src
 FROM cuda-base AS cuda-jupyter-minimal
 
 ARG JUPYTER_REUSABLE_UTILS=jupyter/utils
-ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.11
+ARG MINIMAL_SOURCE_CODE=jupyter/minimal/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -179,7 +179,7 @@ ENTRYPOINT ["start-notebook.sh"]
 #############################
 FROM cuda-jupyter-minimal AS cuda-jupyter-datascience
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
@@ -212,20 +212,20 @@ WORKDIR /opt/app-root/src
 ############################
 FROM cuda-jupyter-datascience AS cuda-jupyter-tensorflow
 
-ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.11
-ARG TENSORFLOW_SOURCE_CODE=jupyter/tensorflow/ubi9-python-3.11
+ARG DATASCIENCE_SOURCE_CODE=jupyter/datascience/ubi9-python-3.12
+ARG TENSORFLOW_SOURCE_CODE=jupyter/tensorflow/ubi9-python-3.12
 
 WORKDIR /opt/app-root/bin
 
-LABEL name="odh-notebook-cuda-jupyter-tensorflow-ubi9-python-3.11" \
+LABEL name="odh-notebook-cuda-jupyter-tensorflow-ubi9-python-3.12" \
     summary="Jupyter CUDA tensorflow notebook image for ODH notebooks" \
-    description="Jupyter CUDA tensorflow notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    description="Jupyter CUDA tensorflow notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     io.k8s.display-name="Jupyter CUDA tensorflow notebook image for ODH notebooks" \
-    io.k8s.description="Jupyter CUDA tensorflow notebook image with base Python 3.11 builder image based on UBI9 for ODH notebooks" \
+    io.k8s.description="Jupyter CUDA tensorflow notebook image with base Python 3.12 builder image based on UBI9 for ODH notebooks" \
     authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
     io.openshift.build.commit.ref="main" \
-    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/tensorflow/ubi9-python-3.11" \
-    io.openshift.build.image="quay.io/opendatahub/workbench-images:cuda-jupyter-tensorflow-ubi9-python-3.11"
+    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/tensorflow/ubi9-python-3.12" \
+    io.openshift.build.image="quay.io/opendatahub/workbench-images:cuda-jupyter-tensorflow-ubi9-python-3.12"
 
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY ${TENSORFLOW_SOURCE_CODE}/Pipfile.lock ./
@@ -244,7 +244,7 @@ RUN echo "Installing softwares and packages" && \
     # Apply JupyterLab addons \
     /opt/app-root/bin/utils/addons/apply.sh && \
     # Fix permissions to support pip in Openshift environments \
-    chmod -R g+w /opt/app-root/lib/python3.11/site-packages && \
+    chmod -R g+w /opt/app-root/lib/python3.12/site-packages && \
     fix-permissions /opt/app-root -P
 
 WORKDIR /opt/app-root/src

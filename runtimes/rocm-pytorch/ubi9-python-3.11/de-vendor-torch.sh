@@ -6,7 +6,7 @@ set -ex
 
 # Source: https://github.com/tiran/instructlab-containers/blob/main/containers/rocm/de-vendor-torch.sh
 
-PYTHON=python3.11
+PYTHON=python3.12
 ROCMLIB=/opt/rocm/lib
 TORCHLIB=/opt/app-root/lib/${PYTHON}/site-packages/torch/lib
 

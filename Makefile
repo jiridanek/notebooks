@@ -20,7 +20,7 @@ endif
 
 IMAGE_REGISTRY   ?= quay.io/opendatahub/workbench-images
 RELEASE	 		 ?= 2025a
-RELEASE_PYTHON_VERSION	 ?= 3.11
+RELEASE_PYTHON_VERSION	 ?= 3.12
 # additional user-specified caching parameters for $(CONTAINER_ENGINE) build
 CONTAINER_BUILD_CACHE_ARGS ?= --no-cache
 # whether to push the images to a registry as they are built
@@ -389,7 +389,7 @@ validate-rstudio-image: bin/kubectl
 
 # This recipe used mainly from the Pipfile.locks Renewal Action
 # Default Python version
-PYTHON_VERSION ?= 3.11
+PYTHON_VERSION ?= 3.12
 ROOT_DIR := $(shell pwd)
 BASE_DIRS := jupyter/minimal/ubi9-python-$(PYTHON_VERSION) \
 		jupyter/datascience/ubi9-python-$(PYTHON_VERSION) \
@@ -412,7 +412,7 @@ INCLUDE_OPT_DIRS ?= false
 OPT_DIRS :=
 
 # This recipe gets args, can be used like
-# make refresh-pipfilelock-files PYTHON_VERSION=3.11 INCLUDE_OPT_DIRS=false
+# make refresh-pipfilelock-files PYTHON_VERSION=3.12 INCLUDE_OPT_DIRS=false
 .PHONY: refresh-pipfilelock-files
 refresh-pipfilelock-files:
 	@echo "Updating Pipfile.lock files for Python $(PYTHON_VERSION)"

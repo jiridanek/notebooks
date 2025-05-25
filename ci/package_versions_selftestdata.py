@@ -20,7 +20,7 @@ spec:
         # language=json
         opendatahub.io/notebook-software: |
           [
-            {"name": "Python", "version": "v3.11"}
+            {"name": "Python", "version": "v3.12"}
           ]
         # language=json
         opendatahub.io/notebook-python-dependencies: |

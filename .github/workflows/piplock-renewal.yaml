@@ -15,9 +15,10 @@ on:  # yamllint disable-line rule:truthy
       python_version:
         description: 'Select Python version to update Pipfile.lock'
         required: false
-        default: '3.11'
+        default: '3.12'
         type: choice
         options:
+          - '3.12'
           - '3.11'
           - '3.9'
           - '3.8'
@@ -37,7 +38,7 @@ jobs:
       contents: write
     env:
       BRANCH: ${{ github.event.inputs.branch || 'main' }}
-      PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.11' }}
+      PYTHON_VERSION: ${{ github.event.inputs.python_version || '3.12' }}
       INCLUDE_OPT_DIRS: ${{ github.event.inputs.update_optional_dirs || 'false' }}
     steps:
       # Checkout the specified branch from the specified organization
@@ -53,7 +54,7 @@ jobs:
          git config --global user.email "github-actions[bot]@users.noreply.github.com"
          git config --global user.name "GitHub Actions"
 
-      # Setup Python environment with the specified version (or default to '3.11')
+      # Setup Python environment with the specified version (or default to '3.12')
       - name: Setup Python environment
         uses: actions/setup-python@v5
         with:
