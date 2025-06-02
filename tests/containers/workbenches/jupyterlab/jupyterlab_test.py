@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pathlib
 import tempfile
-import textwrap
+
 import allure
 import pytest
 import requests
@@ -100,7 +100,7 @@ class TestJupyterLabImage:
                 "nbformat": 4,
                 "nbformat_minor": 5
             }
-        """.replace('\n', '')
+        """.replace("\n", "")
         try:
             container.start(wait_for_readiness=True)
             with tempfile.TemporaryDirectory() as tmpdir:
@@ -114,3 +114,19 @@ class TestJupyterLabImage:
             assert 0 == exit_code
         finally:
             docker_utils.NotebookContainer(container).stop(timeout=0)
+
+    @allure.issue("RHOAIENG-24348")
+    @allure.description("Check that custom-built (to be FIPS-compliant) mongocli binary runs.")
+    def test_mongocli_binary_runs(self, jupyterlab_image: conftest.Image) -> None:
+        if "-minimal-" in jupyterlab_image.name and all(
+            accelerator not in jupyterlab_image.name for accelerator in ["-cuda-", "-rocm-"]
+        ):
+            pytest.skip("Skipping monglicli binary test for jupyter minimal image because it does not ship mongocli")
+        container = WorkbenchContainer(image=jupyterlab_image.name, user=4321, group_add=[0])
+        container.start(wait_for_readiness=False)
+        try:
+            # https://github.com/opendatahub-io/notebooks/pull/1087#discussion_r2089094962
+            # we did not manage to get `mongocli --version` to work, so we'll run this instead
+            docker_utils.container_exec(container.get_wrapped_container(), "mongocli config --help")
+        finally:
+            docker_utils.NotebookContainer(container).stop(timeout=0)  # if no env is specified, the image will run
