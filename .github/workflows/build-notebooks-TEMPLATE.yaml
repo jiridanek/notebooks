@@ -316,7 +316,7 @@ jobs:
 
           EXTRA_PODMAN_BUILD_ARGS = ' '.join(args)
           with open(os.environ["GITHUB_OUTPUT"], "wt") as fp:
-              print(f"{EXTRA_PODMAN_BUILD_ARGS=}", file=fp)
+              print(f"EXTRA_PODMAN_BUILD_ARGS={EXTRA_PODMAN_BUILD_ARGS}", file=fp)
 
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
