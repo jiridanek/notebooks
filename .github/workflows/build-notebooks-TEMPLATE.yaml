@@ -301,18 +301,20 @@ jobs:
 
       - name: Compute extra podman build args
         id: extra-podman-build-args
+        shell: /usr/bin/env python3 {0}
+        # language=Python
         run: |
-          set -Eeuxo pipefail
+          import os
 
-          EXTRA_PODMAN_BUILD_ARGS=""
-          if [[ "${{ inputs.platform }}" == "linux/s390x" ]]; then
-            # workaround for known issue https://github.com/zeromq/libzmq/pull/4486
-            # In qemu-user, CACHELINE_SIZE probe is undefined
-            EXTRA_PODMAN_BUILD_ARGS+=' --build-arg=CXXFLAGS=-Dundefined=64'
-            # many wheels are built from sources, so enable parallel make builds
-            EXTRA_PODMAN_BUILD_ARGS+=' --build-arg=MAKEFLAGS=-j$(nproc)'
-          fi
-          echo "EXTRA_PODMAN_BUILD_ARGS=$EXTRA_PODMAN_BUILD_ARGS" >> $GITHUB_OUTPUT
+          EXTRA_PODMAN_BUILD_ARGS = []
+          if "${{ inputs.platform }}" == "linux/s390x":
+              # workaround for known issue https://github.com/zeromq/libzmq/pull/4486
+              # In qemu-user, CACHELINE_SIZE probe is undefined
+              EXTRA_PODMAN_BUILD_ARGS.append("--build-arg=CXXFLAGS=-Dundefined=64")
+              # many wheels are built from sources, so enable parallel make builds
+              EXTRA_PODMAN_BUILD_ARGS.append("--build-arg=MAKEFLAGS=-j$(nproc)")
+          with open(os.environ["GITHUB_OUTPUT"], "wt") as fp:
+              print(f"EXTRA_PODMAN_BUILD_ARGS={' '.join(EXTRA_PODMAN_BUILD_ARGS)}", file=fp)
 
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
