@@ -311,8 +311,6 @@ jobs:
               # workaround for known issue https://github.com/zeromq/libzmq/pull/4486
               # In qemu-user, CACHELINE_SIZE probe is undefined
               args.append("--env=CXXFLAGS=-Dundefined=64")
-              # many wheels are built from sources, so enable parallel make builds
-              args.append("--env=MAKEFLAGS=-j$(nproc)")
 
           EXTRA_PODMAN_BUILD_ARGS = ' '.join(args)
           with open(os.environ["GITHUB_OUTPUT"], "wt") as fp:
