@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: instant-merge
-        if: ${{ github.event.sender.login == 'red-hat-konflux[bot]' && ( contains(github.event.pull_request.title, 'Update odh-workbench-jupyter-') || contains(github.event.pull_request.title, 'Update odh-workbench-codeserver-') || contains(github.event.pull_request.title, 'Update odh-pipeline-runtime-') ) }}
+        #if: ${{ github.event.sender.login == 'red-hat-konflux[bot]' && ( contains(github.event.pull_request.title, 'Update odh-workbench-jupyter-') || contains(github.event.pull_request.title, 'Update odh-workbench-codeserver-') || contains(github.event.pull_request.title, 'Update odh-pipeline-runtime-') ) }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
