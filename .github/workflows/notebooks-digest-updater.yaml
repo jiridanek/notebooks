@@ -69,7 +69,7 @@ jobs:
       - name: Invoke ci/sha-digest-updater.sh script to handle the updates
         shell: bash
         run: |
-          bash "${GITHUB_WORKSPACE}/ci/sha-digest-updater.sh" "${{ env.USER_HASH }}" "${{ env.REPO_ORG }}" "${{ env.BRANCH_NAME }}" "${{ env.REPO_NAME }}"
+          bash "${GITHUB_WORKSPACE}/ci/sha-digest-updater.sh" "${{ env.USER_HASH }}" "opendatahub-io" "${{ env.BRANCH_NAME }}" "notebooks"
 
       - name: Commit Changes
         run: |
