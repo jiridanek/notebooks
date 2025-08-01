@@ -1,0 +1,253 @@
+name: Rebase PR Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request number to rebase'
+        required: true
+        type: number
+      target_branch:
+        description: 'Target branch to rebase onto'
+        required: false
+        default: 'main'
+        type: string
+      force_push:
+        description: 'Force push the rebased branch'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      add_comment:
+        description: 'Add status comment to PR'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  rebase-pr:
+    name: Rebase PR Branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: Validate inputs
+        run: |
+          if [[ "${{ github.event.inputs.pr_number }}" -le 0 ]]; then
+            echo "Error: PR number must be a positive integer"
+            exit 1
+          fi
+          echo "Rebasing PR #${{ github.event.inputs.pr_number }} onto ${{ github.event.inputs.target_branch }}"
+      
+      - name: Get PR details
+        id: pr_details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: ${{ github.event.inputs.pr_number }}
+              });
+              
+              // Validate PR state
+              if (pr.state !== 'open') {
+                core.setFailed(`PR #${{ github.event.inputs.pr_number }} is not open (current state: ${pr.state})`);
+                return;
+              }
+              
+              if (pr.draft) {
+                core.warning(`PR #${{ github.event.inputs.pr_number }} is a draft PR`);
+              }
+              
+              // Set outputs
+              core.setOutput('head_ref', pr.head.ref);
+              core.setOutput('head_sha', pr.head.sha);
+              core.setOutput('base_ref', pr.base.ref);
+              core.setOutput('head_repo_full_name', pr.head.repo.full_name);
+              core.setOutput('base_repo_full_name', pr.base.repo.full_name);
+              core.setOutput('pr_title', pr.title);
+              core.setOutput('is_fork', pr.head.repo.full_name !== pr.base.repo.full_name);
+              
+              console.log(`PR Details:
+              - Title: ${pr.title}
+              - Head: ${pr.head.repo.full_name}:${pr.head.ref}
+              - Base: ${pr.base.repo.full_name}:${pr.base.ref}
+              - Is Fork: ${pr.head.repo.full_name !== pr.base.repo.full_name}`);
+              
+            } catch (error) {
+              core.setFailed(`Failed to get PR details: ${error.message}`);
+            }
+      
+      - name: Add initial comment
+        if: github.event.inputs.add_comment == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.inputs.pr_number }},
+              body: `🔄 **Rebase started**\n\nRebasing \`${{ steps.pr_details.outputs.head_ref }}\` onto \`${{ github.event.inputs.target_branch }}\`...\n\n_Triggered by: @${{ github.actor }}_`
+            });
+      
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          repository: ${{ steps.pr_details.outputs.head_repo_full_name }}
+          ref: ${{ steps.pr_details.outputs.head_ref }}
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Setup remotes and fetch
+        run: |
+          # Add upstream remote if it's a fork
+          if [[ "${{ steps.pr_details.outputs.is_fork }}" == "true" ]]; then
+            git remote add upstream https://github.com/${{ steps.pr_details.outputs.base_repo_full_name }}.git
+            git fetch upstream
+            UPSTREAM_REF="upstream/${{ github.event.inputs.target_branch }}"
+          else
+            git fetch origin
+            UPSTREAM_REF="origin/${{ github.event.inputs.target_branch }}"
+          fi
+          
+          echo "UPSTREAM_REF=$UPSTREAM_REF" >> $GITHUB_ENV
+          
+          # Show current state
+          echo "Current branch: $(git branch --show-current)"
+          echo "Current HEAD: $(git rev-parse HEAD)"
+          echo "Target ref: $UPSTREAM_REF"
+          echo "Target HEAD: $(git rev-parse $UPSTREAM_REF)"
+      
+      - name: Check if rebase is needed
+        id: rebase_check
+        run: |
+          # Check if the branch is already up to date
+          if git merge-base --is-ancestor $UPSTREAM_REF HEAD; then
+            echo "needs_rebase=false" >> $GITHUB_OUTPUT
+            echo "Branch is already up to date with ${{ github.event.inputs.target_branch }}"
+          else
+            echo "needs_rebase=true" >> $GITHUB_OUTPUT
+            echo "Branch needs to be rebased onto ${{ github.event.inputs.target_branch }}"
+            
+            # Show what commits will be rebased
+            echo "Commits to be rebased:"
+            git log --oneline $UPSTREAM_REF..HEAD
+          fi
+      
+      - name: Perform rebase
+        id: rebase
+        if: steps.rebase_check.outputs.needs_rebase == 'true'
+        run: |
+          set +e  # Don't exit on error immediately
+          
+          echo "Starting rebase of ${{ steps.pr_details.outputs.head_ref }} onto $UPSTREAM_REF"
+          
+          # Attempt the rebase
+          git rebase $UPSTREAM_REF
+          REBASE_EXIT_CODE=$?
+          
+          if [ $REBASE_EXIT_CODE -eq 0 ]; then
+            echo "rebase_success=true" >> $GITHUB_OUTPUT
+            echo "✅ Rebase completed successfully"
+            
+            # Show the rebased commits
+            echo "Rebased commits:"
+            git log --oneline $UPSTREAM_REF..HEAD
+          else
+            echo "rebase_success=false" >> $GITHUB_OUTPUT
+            echo "❌ Rebase failed with conflicts"
+            
+            # Get conflicted files
+            CONFLICTED_FILES=$(git diff --name-only --diff-filter=U 2>/dev/null || echo "Unable to determine conflicted files")
+            echo "conflicted_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CONFLICTED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            
+            # Show conflict details
+            echo "Conflicted files:"
+            echo "$CONFLICTED_FILES"
+            
+            # Abort the rebase
+            git rebase --abort
+            exit 1
+          fi
+      
+      - name: Force push rebased branch
+        if: steps.rebase_check.outputs.needs_rebase == 'true' && steps.rebase.outputs.rebase_success == 'true' && github.event.inputs.force_push == 'true'
+        run: |
+          echo "Force pushing rebased branch..."
+          git push --force-with-lease origin ${{ steps.pr_details.outputs.head_ref }}
+          echo "✅ Successfully pushed rebased branch"
+      
+      - name: Comment on success (no rebase needed)
+        if: steps.rebase_check.outputs.needs_rebase == 'false' && github.event.inputs.add_comment == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.inputs.pr_number }},
+              body: `✅ **No rebase needed**\n\nThe branch \`${{ steps.pr_details.outputs.head_ref }}\` is already up to date with \`${{ github.event.inputs.target_branch }}\`.`
+            });
+      
+      - name: Comment on rebase success
+        if: steps.rebase_check.outputs.needs_rebase == 'true' && steps.rebase.outputs.rebase_success == 'true' && github.event.inputs.add_comment == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const forceMsg = '${{ github.event.inputs.force_push }}' === 'true' 
+              ? '\n\n🚀 **Branch updated**: The rebased commits have been force-pushed to the PR branch.'
+              : '\n\n⚠️ **Manual push required**: The rebase was successful, but you need to manually push the changes.';
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.inputs.pr_number }},
+              body: `✅ **Rebase completed successfully!**\n\nThe PR branch \`${{ steps.pr_details.outputs.head_ref }}\` has been rebased onto \`${{ github.event.inputs.target_branch }}\`.${forceMsg}`
+            });
+      
+      - name: Comment on rebase failure
+        if: failure() && steps.rebase.conclusion == 'failure' && github.event.inputs.add_comment == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let conflictInfo = '';
+            const conflictedFiles = `${{ steps.rebase.outputs.conflicted_files }}`.trim();
+            
+            if (conflictedFiles && conflictedFiles !== 'Unable to determine conflicted files') {
+              conflictInfo = `\n\n**Conflicted files:**\n\`\`\`\n${conflictedFiles}\n\`\`\``;
+            }
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.inputs.pr_number }},
+              body: `❌ **Rebase failed!**\n\nThere are merge conflicts that need to be resolved manually.${conflictInfo}\n\n**Next steps:**\n1. Checkout the branch locally: \`git checkout ${{ steps.pr_details.outputs.head_ref }}\`\n2. Rebase manually: \`git rebase ${{ github.event.inputs.target_branch }}\`\n3. Resolve conflicts and continue: \`git rebase --continue\`\n4. Force push: \`git push --force-with-lease\``
+            });
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Rebase Summary"
+          echo "- PR: #${{ github.event.inputs.pr_number }}"
+          echo "- Branch: ${{ steps.pr_details.outputs.head_ref }}"
+          echo "- Target: ${{ github.event.inputs.target_branch }}"
+          echo "- Needed rebase: ${{ steps.rebase_check.outputs.needs_rebase }}"
+          echo "- Rebase success: ${{ steps.rebase.outputs.rebase_success }}"
+          echo "- Force pushed: ${{ github.event.inputs.force_push }}"
