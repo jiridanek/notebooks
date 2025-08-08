@@ -20,6 +20,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set cache parameters
+        id: cache-parameters
+        # language=bash
+        run: |
+          echo "SKOPEO_CACHE_DIR=$HOME/.cache/skopeo" >> "${GITHUB_OUTPUT}"
+          # Adjust +%Y-%m to +%G-%V for weekly rotation if desired.
+          echo "SKOPEO_CACHE_EPOCH=$(date -u +%Y-%m)" >> "${GITHUB_OUTPUT}"
+
+      - name: Create skopeo cache directory
+        id: create-skopeo-cache-dir
+        run: mkdir -p "${{ steps.cache-parameters.outputs.SKOPEO_CACHE_DIR }}"
+
+      - name: Restore skopeo cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.cache-parameters.outputs.SKOPEO_CACHE_DIR }}
+          key: skopeo-cache-v1-${{ steps.cache-parameters.outputs.SKOPEO_CACHE_EPOCH }}
+          restore-keys: |
+            skopeo-cache-v1-
+
       - name: Install dependencies
         run: |
           sudo apt-get install -y skopeo jq
@@ -27,3 +47,15 @@ jobs:
       - name: Validate the 'manifests/base/params.env' file content
         run: |
           bash ./ci/check-params-env.sh
+
+      # Best-effort pruning to prevent unbounded local growth of the cache content.
+      - name: Prune skopeo cache (remove files older than 30 days)
+        if: always() && steps.create-skopeo-cache-dir.outcome == 'success'
+        # language=bash
+        run: |
+          if [ -d "${SKOPEO_CACHE_DIR}" ]; then
+            find "${SKOPEO_CACHE_DIR}" -type f -mtime +30 -print -delete || true
+            find "${SKOPEO_CACHE_DIR}" -type d -empty -delete || true
+          fi
+        env:
+          SKOPEO_CACHE_DIR: ${{ steps.cache-parameters.outputs.SKOPEO_CACHE_DIR }}
