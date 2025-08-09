@@ -35,6 +35,9 @@ def main():
     key = hashlib.sha256(str(args).encode()).hexdigest()
     value_file = cache_dir / key
 
+    # Cache only when the last arg contains a digest image reference ('@sha256:...')
+    is_cacheable = bool(args and "@sha256:" in args[-1])
+
     """Ad-hoc caching implementation.
 
     Caches the result of a process execution in a pickle file named by hash of the arguments..
@@ -45,24 +48,31 @@ def main():
     Implemented after considering https://pypi.org/project/diskcache/
      and the alternative packages mentioned in its documentation."""
     value: ProcessResult
-    if value_file.exists():
-        print("Using cached result from {}".format(value_file), file=sys.stderr)
+    if is_cacheable and value_file.exists():
+        print("Using a cached result from {}".format(value_file), file=sys.stderr)
         with open(value_file, "rb") as value_fp:
             value = pickle.load(value_fp)
+        # update cache file mtime to prevent it from being removed on timer
+        value_file.touch(exist_ok=True)
     else:
-        print("running skopeo:", args, file=sys.stderr)
+        print("Running skopeo", args, file=sys.stderr)
         skopeo_path = next(s for s in whiches("skopeo")
-                           if pathlib.Path(s).absolute() != pathlib.Path(__file__))
-        process = subprocess.run([skopeo_path, *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                           if pathlib.Path(s).resolve() != pathlib.Path(__file__).resolve())
+        process = subprocess.run([skopeo_path, *args],
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                 text=True,
+                                 encoding="utf-8",
+                                 errors="replace",
                                  check=False)
         value = ProcessResult(
             args=args,
-            stdout=process.stdout.decode(),
-            stderr=process.stderr.decode(),
+            stdout=process.stdout,
+            stderr=process.stderr,
             returncode=process.returncode)
-        with tempfile.NamedTemporaryFile(dir=cache_dir, delete=False) as tmp_file:
-            pickle.dump(value, tmp_file, protocol=0)  # protocol 0 is text-based
-        shutil.move(tmp_file.name, value_file)
+        if is_cacheable and process.returncode == 0:
+            with tempfile.NamedTemporaryFile(dir=cache_dir, delete=False) as tmp_file:
+                pickle.dump(value, tmp_file, protocol=0)  # protocol 0 is text-based
+            pathlib.Path(tmp_file.name).replace(value_file)
 
     print(value.stdout, end="")
     print(value.stderr, end="", file=sys.stderr)
