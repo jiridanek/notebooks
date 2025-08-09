@@ -61,8 +61,7 @@ def main():
         )
         process = subprocess.run(
             [skopeo_path, *args],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
@@ -79,7 +78,7 @@ def main():
     sys.exit(value.returncode)
 
 
-def whiches(cmd: str, mode: int = os.F_OK | os.X_OK, path: str = None) -> Generator[str, None, None]:
+def whiches(cmd: str, mode: int = os.F_OK | os.X_OK, path: str | None = None) -> Generator[str, None, None]:
     """Returns an iterable of all occurrences of `cmd` in `PATH` or `path`."""
     paths = (path or os.environ.get("PATH", os.defpath)).split(os.pathsep)
     return (w for p in paths if (w := shutil.which(cmd, mode, p)) is not None)
