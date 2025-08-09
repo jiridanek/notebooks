@@ -30,6 +30,7 @@ PARAMS_ENV_PATH="manifests/base/params.env"
 EXPECTED_NUM_RECORDS=44
 EXPECTED_ADDI_RUNTIME_RECORDS=0
 
+SKOPEO_BIN="ci/cached_skopeo.py"
 # Number of attempts for the skopeo tool to gather data from the repository.
 SKOPEO_RETRY=3
 
@@ -481,7 +482,7 @@ function check_image() {
     local image_commitref
     local image_created
 
-    image_metadata_config="$(skopeo inspect --retry-times "${SKOPEO_RETRY}" --config "docker://${image_url}")" || {
+    image_metadata_config="$(${SKOPEO_BIN} inspect --retry-times "${SKOPEO_RETRY}" --config "docker://${image_url}")" || {
         echo "Couldn't download image config metadata with skopeo tool!"
         return 1
     }
@@ -528,7 +529,7 @@ function check_image() {
     local image_size
     local image_size_mb
 
-    image_metadata="$(skopeo inspect --retry-times "${SKOPEO_RETRY}" --raw "docker://${image_url}")" || {
+    image_metadata="$(${SKOPEO_BIN} inspect --retry-times "${SKOPEO_RETRY}" --raw "docker://${image_url}")" || {
         echo "Couldn't download image metadata with skopeo tool!"
         return 1
     }
