@@ -13,11 +13,11 @@ import tempfile
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Generator
+    from collections.abc import Generator
 
 
 @dataclasses.dataclass
-class ProcessResult():
+class ProcessResult:
     """Cacheable result of a process execution."""
 
     args: list[str]
@@ -56,19 +56,19 @@ def main():
         value_file.touch(exist_ok=True)
     else:
         print("Running skopeo", args, file=sys.stderr)
-        skopeo_path = next(s for s in whiches("skopeo")
-                           if pathlib.Path(s).resolve() != pathlib.Path(__file__).resolve())
-        process = subprocess.run([skopeo_path, *args],
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 text=True,
-                                 encoding="utf-8",
-                                 errors="replace",
-                                 check=False)
-        value = ProcessResult(
-            args=args,
-            stdout=process.stdout,
-            stderr=process.stderr,
-            returncode=process.returncode)
+        skopeo_path = next(
+            s for s in whiches("skopeo") if pathlib.Path(s).resolve() != pathlib.Path(__file__).resolve()
+        )
+        process = subprocess.run(
+            [skopeo_path, *args],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+        value = ProcessResult(args=args, stdout=process.stdout, stderr=process.stderr, returncode=process.returncode)
         if is_cacheable and process.returncode == 0:
             with tempfile.NamedTemporaryFile(dir=cache_dir, delete=False) as tmp_file:
                 pickle.dump(value, tmp_file, protocol=0)  # protocol 0 is text-based
@@ -82,8 +82,7 @@ def main():
 def whiches(cmd: str, mode: int = os.F_OK | os.X_OK, path: str = None) -> Generator[str, None, None]:
     """Returns an iterable of all occurrences of `cmd` in `PATH` or `path`."""
     paths = (path or os.environ.get("PATH", os.defpath)).split(os.pathsep)
-    return (w for p in paths
-            if (w := shutil.which(cmd, mode, p)) is not None)
+    return (w for p in paths if (w := shutil.which(cmd, mode, p)) is not None)
 
 
 if __name__ == "__main__":
