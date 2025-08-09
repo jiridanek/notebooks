@@ -9,6 +9,7 @@ on:  # yamllint disable-line rule:truthy
       - 'manifests/base/commit-latest.env'
       - 'manifests/base/params-latest.env'
       - 'ci/check-params-env.sh'
+      - 'ci/cached_skopeo.py'
   workflow_dispatch:
 
 permissions:
