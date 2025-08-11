@@ -69,10 +69,12 @@ jobs:
       - name: Install pipenv
         run: pip install pipenv
 
-      - name: Cache pip packages for pipenv lock
+      - name: Cache pip and pipenv packages for pipenv lock
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
+          path: |
+            ~/.cache/pip
+            ~/.cache/pipenv
           key: ${{ runner.os }}-piplock-renewal-${{ matrix.python-version }}-${{ hashFiles(format('**/*-python-{0}/Pipfile', matrix.python-version)) }}
           restore-keys: |
             ${{ runner.os }}-piplock-renewal-${{ matrix.python-version }}-
