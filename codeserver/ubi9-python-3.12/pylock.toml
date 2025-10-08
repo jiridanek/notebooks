@@ -24,9 +24,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/25/8a/c46dcc25341b5bc
 
 [[packages]]
 name = "attrs"
-version = "25.3.0"
-sdist = { url = "https://files.pythonhosted.org/packages/5a/b0/1367933a8532ee6ff8d63537de4f1177af4bff9f3e829baf7331f595bb24/attrs-25.3.0.tar.gz", upload-time = 2025-03-13T11:10:22Z, size = 812032, hashes = { sha256 = "75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl", upload-time = 2025-03-13T11:10:21Z, size = 63815, hashes = { sha256 = "427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3" } }]
+version = "25.4.0"
+sdist = { url = "https://files.pythonhosted.org/packages/6b/5c/685e6633917e101e5dcb62b9dd76946cbb57c26e133bae9e0cd36033c0a9/attrs-25.4.0.tar.gz", upload-time = 2025-10-06T13:54:44Z, size = 934251, hashes = { sha256 = "16d5969b87f0859ef33a48b35d55ac1be6e42ae49d5e853b597db70c35c57e11" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/3a/2a/7cc015f5b9f5db42b7d48157e23356022889fc354a2813c15934b7cb5c0e/attrs-25.4.0-py3-none-any.whl", upload-time = 2025-10-06T13:54:43Z, size = 67615, hashes = { sha256 = "adcf7e2a1fb3b36ac48d97835bb6d8ade15b8dcce26aba8bf1d14847b57a3373" } }]
 
 [[packages]]
 name = "bigtree"
@@ -36,15 +36,15 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/d7/e1/2f3e41079318bf2
 
 [[packages]]
 name = "boto3"
-version = "1.40.42"
-sdist = { url = "https://files.pythonhosted.org/packages/97/41/291ea7af352ca7a89619e09e6927d9b7eac415857abd838be88d7f82cd8f/boto3-1.40.42.tar.gz", upload-time = 2025-09-30T19:28:15Z, size = 111601, hashes = { sha256 = "dbd8afc41f0cc759d0115c673e50bd1395b992a5c14627b56163cf35b86673c6" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/58/b6/c873130aa586ed2df48d0d4a44e897a24c5f2ff800f108e8d973d7a9f19c/boto3-1.40.42-py3-none-any.whl", upload-time = 2025-09-30T19:28:13Z, size = 139344, hashes = { sha256 = "71ea8ca488e8b0d0a16b1b32816f8bab9aa66757c4122caf137ae2dbc95d7001" } }]
+version = "1.40.47"
+sdist = { url = "https://files.pythonhosted.org/packages/af/32/16ffef2a7ca05babd5d36d512b07bd318feb6af87aa83ced29d565f6a6be/boto3-1.40.47.tar.gz", upload-time = 2025-10-07T19:26:37Z, size = 111607, hashes = { sha256 = "c0ea31655c41b3f9bf46bc370520eafc081ba4c3e79fa564b60e976663abf7e7" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/c7/25/a3ad490d4ab04417cf887fc52ce266cacde2f15b8d46ec45cc40583f22cd/boto3-1.40.47-py3-none-any.whl", upload-time = 2025-10-07T19:26:35Z, size = 139346, hashes = { sha256 = "33b291200cbb042ca8faac0b52a5d460850712641930d32335b75bc65e88653c" } }]
 
 [[packages]]
 name = "botocore"
-version = "1.40.42"
-sdist = { url = "https://files.pythonhosted.org/packages/d0/64/746b90bebf904e8d94fc740d8e0dabad1bf644c675fdb2e85ffd852665de/botocore-1.40.42.tar.gz", upload-time = 2025-09-30T19:28:05Z, size = 14384122, hashes = { sha256 = "41bea751685fb2a51b4fc6be329a0cd0a285dbeb0686a21099e87ef146664bc0" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/8a/74/c0b454c9ab1b75c70d78068cdb220cb835b6b7eda51243541e125f816c59/botocore-1.40.42-py3-none-any.whl", upload-time = 2025-09-30T19:28:02Z, size = 14054256, hashes = { sha256 = "2682a4120be21234036003a806206b6b3963ba53a495d0a57d40d67fce4497a9" } }]
+version = "1.40.47"
+sdist = { url = "https://files.pythonhosted.org/packages/5f/9e/65a9507f6f4d7ea1f3050a2b555faac7f4afa074ce9bb1dd12aa6fd19fc3/botocore-1.40.47.tar.gz", upload-time = 2025-10-07T19:26:26Z, size = 14401848, hashes = { sha256 = "8eb950046ba8afc99dedb0268282b4f9a61bca2c7a6415036bff2beee5e180ca" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/a2/16/96226328857ab02123bc7b6dc08e27aa5bd1cfa1c553a922239263014ce8/botocore-1.40.47-py3-none-any.whl", upload-time = 2025-10-07T19:26:22Z, size = 14072266, hashes = { sha256 = "0845c5bc49fc9d45938ff3609df7ec1eff0d26c1a4edcd03e16ad2194c3a9a56" } }]
 
 [[packages]]
 name = "cachetools"
@@ -54,9 +54,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/6c/56/3124f61d37a7a4e
 
 [[packages]]
 name = "certifi"
-version = "2025.8.3"
-sdist = { url = "https://files.pythonhosted.org/packages/dc/67/960ebe6bf230a96cda2e0abcf73af550ec4f090005363542f0765df162e0/certifi-2025.8.3.tar.gz", upload-time = 2025-08-03T03:07:47Z, size = 162386, hashes = { sha256 = "e564105f78ded564e3ae7c923924435e1daa7463faeab5bb932bc53ffae63407" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/e5/48/1549795ba7742c948d2ad169c1c8cdbae65bc450d6cd753d124b17c8cd32/certifi-2025.8.3-py3-none-any.whl", upload-time = 2025-08-03T03:07:45Z, size = 161216, hashes = { sha256 = "f6c12493cfb1b06ba2ff328595af9350c65d6644968e5d3a2ffd78699af217a5" } }]
+version = "2025.10.5"
+sdist = { url = "https://files.pythonhosted.org/packages/4c/5b/b6ce21586237c77ce67d01dc5507039d444b630dd76611bbca2d8e5dcd91/certifi-2025.10.5.tar.gz", upload-time = 2025-10-05T04:12:15Z, size = 164519, hashes = { sha256 = "47c09d31ccf2acf0be3f701ea53595ee7e0b8fa08801c6624be771df09ae7b43" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/e4/37/af0d2ef3967ac0d6113837b44a4f0bfe1328c2b9763bd5b1744520e5cfed/certifi-2025.10.5-py3-none-any.whl", upload-time = 2025-10-05T04:12:14Z, size = 163286, hashes = { sha256 = "0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de" } }]
 
 [[packages]]
 name = "charset-normalizer"
@@ -413,10 +413,10 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/47/71/70db47e4f6ce3e5
 
 [[packages]]
 name = "google-api-core"
-version = "2.25.1"
+version = "2.25.2"
 marker = "python_full_version >= '3.6'"
-sdist = { url = "https://files.pythonhosted.org/packages/dc/21/e9d043e88222317afdbdb567165fdbc3b0aad90064c7e0c9eb0ad9955ad8/google_api_core-2.25.1.tar.gz", upload-time = 2025-06-12T20:52:20Z, size = 165443, hashes = { sha256 = "d2aaa0b13c78c61cb3f4282c464c046e45fbd75755683c9c525e6e8f7ed0a5e8" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/14/4b/ead00905132820b623732b175d66354e9d3e69fcf2a5dcdab780664e7896/google_api_core-2.25.1-py3-none-any.whl", upload-time = 2025-06-12T20:52:19Z, size = 160807, hashes = { sha256 = "8a2a56c1fef82987a524371f99f3bd0143702fecc670c72e600c1cda6bf8dbb7" } }]
+sdist = { url = "https://files.pythonhosted.org/packages/09/cd/63f1557235c2440fe0577acdbc32577c5c002684c58c7f4d770a92366a24/google_api_core-2.25.2.tar.gz", upload-time = 2025-10-03T00:07:34Z, size = 166266, hashes = { sha256 = "1c63aa6af0d0d5e37966f157a77f9396d820fba59f9e43e9415bc3dc5baff300" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/c8/d8/894716a5423933f5c8d2d5f04b16f052a515f78e815dab0c2c6f1fd105dc/google_api_core-2.25.2-py3-none-any.whl", upload-time = 2025-10-03T00:07:32Z, size = 162489, hashes = { sha256 = "e9a8f62d363dc8424a8497f4c2a47d6bcda6c16514c935629c257ab5d10210e7" } }]
 
 [[packages]]
 name = "google-auth"
@@ -1138,9 +1138,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/79/7b/2c79738432f5c92
 
 [[packages]]
 name = "narwhals"
-version = "2.6.0"
-sdist = { url = "https://files.pythonhosted.org/packages/00/dd/40ff412dabf90ef6b99266b0b74f217bb88733541733849e0153a108c750/narwhals-2.6.0.tar.gz", upload-time = 2025-09-29T09:08:56Z, size = 561649, hashes = { sha256 = "5c9e2ba923e6a0051017e146184e49fb793548936f978ce130c9f55a9a81240e" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/50/3b/0e2c535c3e6970cfc5763b67f6cc31accaab35a7aa3e322fb6a12830450f/narwhals-2.6.0-py3-none-any.whl", upload-time = 2025-09-29T09:08:54Z, size = 408435, hashes = { sha256 = "3215ea42afb452c6c8527e79cefbe542b674aa08d7e2e99d46b2c9708870e0d4" } }]
+version = "2.7.0"
+sdist = { url = "https://files.pythonhosted.org/packages/87/76/9ca8f4d03f02b8289807d0c91eeb01fa6b7fdd6273769d5bd1f94773b40b/narwhals-2.7.0.tar.gz", upload-time = 2025-10-06T09:39:37Z, size = 569315, hashes = { sha256 = "e3fff7f1610fd3318ede78c969bc5954ce710d585eefdb689586fb69da3da43c" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/74/0d/bc630dfd34ad2150d40f9392e94d3803980e71a47e10a709ce9bfcd40ffe/narwhals-2.7.0-py3-none-any.whl", upload-time = 2025-10-06T09:39:35Z, size = 412767, hashes = { sha256 = "010791aa0cee86d90bf2b658264aaec3eeea34fb4ddf2e83746ea4940bcffae3" } }]
 
 [[packages]]
 name = "nest-asyncio"
@@ -1498,9 +1498,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/40/4b/2028861e724d3bd
 
 [[packages]]
 name = "plotly"
-version = "6.3.0"
-sdist = { url = "https://files.pythonhosted.org/packages/a0/64/850de5076f4436410e1ce4f6a69f4313ef6215dfea155f3f6559335cad29/plotly-6.3.0.tar.gz", upload-time = 2025-08-12T20:22:14Z, size = 6923926, hashes = { sha256 = "8840a184d18ccae0f9189c2b9a2943923fd5cae7717b723f36eef78f444e5a73" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/95/a9/12e2dc726ba1ba775a2c6922d5d5b4488ad60bdab0888c337c194c8e6de8/plotly-6.3.0-py3-none-any.whl", upload-time = 2025-08-12T20:22:09Z, size = 9791257, hashes = { sha256 = "7ad806edce9d3cdd882eaebaf97c0c9e252043ed1ed3d382c3e3520ec07806d4" } }]
+version = "6.3.1"
+sdist = { url = "https://files.pythonhosted.org/packages/0c/63/961d47c9ffd592a575495891cdcf7875dc0903ebb33ac238935714213789/plotly-6.3.1.tar.gz", upload-time = 2025-10-02T16:10:34Z, size = 6956460, hashes = { sha256 = "dd896e3d940e653a7ce0470087e82c2bd903969a55e30d1b01bb389319461bb0" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/3f/93/023955c26b0ce614342d11cc0652f1e45e32393b6ab9d11a664a60e9b7b7/plotly-6.3.1-py3-none-any.whl", upload-time = 2025-10-02T16:10:22Z, size = 9833698, hashes = { sha256 = "8b4420d1dcf2b040f5983eed433f95732ed24930e496d36eb70d211923532e64" } }]
 
 [[packages]]
 name = "prometheus-client"
@@ -2629,9 +2629,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/af/b5/123f13c975e9f27
 
 [[packages]]
 name = "websocket-client"
-version = "1.8.0"
-sdist = { url = "https://files.pythonhosted.org/packages/e6/30/fba0d96b4b5fbf5948ed3f4681f7da2f9f64512e1d303f94b4cc174c24a5/websocket_client-1.8.0.tar.gz", upload-time = 2024-04-23T22:16:16Z, size = 54648, hashes = { sha256 = "3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl", upload-time = 2024-04-23T22:16:14Z, size = 58826, hashes = { sha256 = "17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526" } }]
+version = "1.9.0"
+sdist = { url = "https://files.pythonhosted.org/packages/2c/41/aa4bf9664e4cda14c3b39865b12251e8e7d239f4cd0e3cc1b6c2ccde25c1/websocket_client-1.9.0.tar.gz", upload-time = 2025-10-07T21:16:36Z, size = 70576, hashes = { sha256 = "9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/34/db/b10e48aa8fff7407e67470363eac595018441cf32d5e1001567a7aeba5d2/websocket_client-1.9.0-py3-none-any.whl", upload-time = 2025-10-07T21:16:34Z, size = 82616, hashes = { sha256 = "af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef" } }]
 
 [[packages]]
 name = "websockets"
