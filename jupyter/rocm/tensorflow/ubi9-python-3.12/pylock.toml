@@ -1658,20 +1658,20 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/1f/46/789f883750b0f6c
 
 [[packages]]
 name = "kfp-kubernetes"
-version = "2.14.6"
-sdist = { url = "https://files.pythonhosted.org/packages/6b/dd/e5796e4e64a19da1bf219f7148ab0d8bff183e3bd8c4776cfa71bbd4af31/kfp_kubernetes-2.14.6.tar.gz", upload-time = 2025-10-13T20:10:16Z, size = 18254, hashes = { sha256 = "34e69d5c3b4573c929feccd03d3aafa6e9177478774dfa93f74b12ea1d3e1e91" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/df/41/0471d9d5965ec70062a4beaf8eef054cf99ea1b7d06aed1516b64a547e38/kfp_kubernetes-2.14.6-py3-none-any.whl", upload-time = 2025-10-13T20:10:13Z, size = 25166, hashes = { sha256 = "3ab5e67e05ec6ff1962643ef01d9fdad98ec74b4694d2420f16e8d3a7ddb72a2" } }]
+version = "2.15.1"
+sdist = { url = "https://files.pythonhosted.org/packages/84/1a/3a8842b6e9505fb4f20ac091072ddeb0b829a3a7588c106746f354160c2b/kfp_kubernetes-2.15.1.tar.gz", upload-time = 2025-11-25T22:06:44Z, size = 18261, hashes = { sha256 = "7b3303a431281cef5ca9c1bfb97cdafcc71766b49c8a5cc39a6c0b86688d1734" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/9e/45/dcb3b7ad5d1bc6c7fe8eeb9de18dc2de0eebedacad535047a94f1103b2df/kfp_kubernetes-2.15.1-py3-none-any.whl", upload-time = 2025-11-25T22:06:43Z, size = 25204, hashes = { sha256 = "f6ad96779b443d0ed3e7681e01753285e86f6c1e481023a60bacf1a9ce43ac04" } }]
 
 [[packages]]
 name = "kfp-pipeline-spec"
-version = "2.14.6"
-sdist = { url = "https://files.pythonhosted.org/packages/7b/be/a8aa41bbe65c0578f141f615f30829e68bdc087542248d20a84316252228/kfp_pipeline_spec-2.14.6.tar.gz", upload-time = 2025-10-13T20:06:29Z, size = 10255, hashes = { sha256 = "a4943b0bdf6d991db35ca3a261caf77997676512970959bf9909742df58e2a87" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/56/c7/a331cdb987d5c1764c309e6c9f596a695cfd8fe86ea95fc8a9fbc052cf52/kfp_pipeline_spec-2.14.6-py3-none-any.whl", upload-time = 2025-10-13T20:06:28Z, size = 9550, hashes = { sha256 = "82cbad2976f248f7049be37d241f1e47ecb3d99e720dfd0cab3e0881be458516" } }]
+version = "2.15.1"
+sdist = { url = "https://files.pythonhosted.org/packages/58/73/748288face676f33b56aae9b98ae60750abca01f7c9e7ed96bba74d43b6b/kfp_pipeline_spec-2.15.1.tar.gz", upload-time = 2025-11-25T22:06:44Z, size = 10540, hashes = { sha256 = "124508281a20adea7933e2b9db03a02bc10c102bbe2138da91aec06cb9b4db03" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/09/c0/a0302fa21347ffd96d8a7737fdee1cca21dc7bd20f363aa60694a9fab5a2/kfp_pipeline_spec-2.15.1-py3-none-any.whl", upload-time = 2025-11-25T22:06:43Z, size = 9846, hashes = { sha256 = "d8455687cba2b92f3e3563faf3f5311a0ea6b06a851d6d5a68fd66bcb722f24d" } }]
 
 [[packages]]
 name = "kfp-server-api"
-version = "2.14.6"
-sdist = { url = "https://files.pythonhosted.org/packages/7b/9d/47f38ed0914bbf6c7e70693b805d822b0848d2f79cce0aa2addb2a7b2f67/kfp-server-api-2.14.6.tar.gz", upload-time = 2025-10-15T15:43:52Z, size = 64327, hashes = { sha256 = "eabf673f384186968d88cff9674cd39c655537aad1abacda78086575924d6bfc" } }
+version = "2.15.1"
+sdist = { url = "https://files.pythonhosted.org/packages/ca/6c/d8b560146e1e096781b65ef6f4695551bdc348cd9dc7e7ed5b8b223c58b5/kfp_server_api-2.15.1.tar.gz", upload-time = 2025-11-25T22:06:15Z, size = 63432, hashes = { sha256 = "a68f1ef15a62cc317f86db7ac431feccba4e004c4630bc2e201d91dcca64bdef" } }
 
 [[packages]]
 name = "kiwisolver"
@@ -2009,9 +2009,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be
 
 [[packages]]
 name = "minio"
-version = "7.2.18"
-sdist = { url = "https://files.pythonhosted.org/packages/71/99/1ad8733fa3f2fa82726e470f8c321e17f9321083b234ab45ad6b59d80d9f/minio-7.2.18.tar.gz", upload-time = 2025-09-29T17:00:28Z, size = 135544, hashes = { sha256 = "173402a5716099159c5659f9de75be204ebe248557b9f1cc9cf45aa70e9d3024" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/7d/ae/f32695da4f93de50dd7075100dab8cf689a9d96270f58ce6f940fd044a3e/minio-7.2.18-py3-none-any.whl", upload-time = 2025-09-29T17:00:26Z, size = 93120, hashes = { sha256 = "f23a6edbff8d0bc4b5c1a61b2628a01c5a3342aefc613ff9c276012e6321108f" } }]
+version = "7.2.19"
+sdist = { url = "https://files.pythonhosted.org/packages/a2/6c/dc6f0697357a0f71f2773af8e69d658c673e68954e0d0d53242918404fc3/minio-7.2.19.tar.gz", upload-time = 2025-11-24T08:50:48Z, size = 149526, hashes = { sha256 = "756f97fb3d19d198facd1b6ff44006a58934a5b09d512e343227cdaf92f3da13" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/b2/e6/7921c4daf50eefe1a0ef6d5c06ce9c66ec48bf1baec5b1a257c06285a856/minio-7.2.19-py3-none-any.whl", upload-time = 2025-11-24T08:50:46Z, size = 103517, hashes = { sha256 = "53093c99c8716fdd089aec2e29bff28fe20f962334a096b72c6e6201e32628e0" } }]
 
 [[packages]]
 name = "mistune"
@@ -2357,9 +2357,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/a0/c4/c2971a3ba4c6103
 
 [[packages]]
 name = "networkx"
-version = "3.5"
-sdist = { url = "https://files.pythonhosted.org/packages/6c/4f/ccdb8ad3a38e583f214547fd2f7ff1fc160c43a75af88e6aec213404b96a/networkx-3.5.tar.gz", upload-time = 2025-05-29T11:35:07Z, size = 2471065, hashes = { sha256 = "d4c6f9cf81f52d69230866796b82afbccdec3db7ae4fbd1b65ea750feed50037" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/eb/8d/776adee7bbf76365fdd7f2552710282c79a4ead5d2a46408c9043a2b70ba/networkx-3.5-py3-none-any.whl", upload-time = 2025-05-29T11:35:04Z, size = 2034406, hashes = { sha256 = "0030d386a9a06dee3565298b4a734b68589749a544acbb6c412dc9e2489ec6ec" } }]
+version = "3.6"
+sdist = { url = "https://files.pythonhosted.org/packages/e8/fc/7b6fd4d22c8c4dc5704430140d8b3f520531d4fe7328b8f8d03f5a7950e8/networkx-3.6.tar.gz", upload-time = 2025-11-24T03:03:47Z, size = 2511464, hashes = { sha256 = "285276002ad1f7f7da0f7b42f004bcba70d381e936559166363707fdad3d72ad" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/07/c7/d64168da60332c17d24c0d2f08bdf3987e8d1ae9d84b5bbd0eec2eb26a55/networkx-3.6-py3-none-any.whl", upload-time = 2025-11-24T03:03:45Z, size = 2063713, hashes = { sha256 = "cdb395b105806062473d3be36458d8f1459a4e4b98e236a66c3a48996e07684f" } }]
 
 [[packages]]
 name = "notebook-shim"
@@ -3033,9 +3033,9 @@ wheels = [
 
 [[packages]]
 name = "psycopg"
-version = "3.2.12"
-sdist = { url = "https://files.pythonhosted.org/packages/a8/77/c72d10262b872617e509a0c60445afcc4ce2cd5cd6bc1c97700246d69c85/psycopg-3.2.12.tar.gz", upload-time = 2025-10-26T00:46:03Z, size = 160642, hashes = { sha256 = "85c08d6f6e2a897b16280e0ff6406bef29b1327c045db06d21f364d7cd5da90b" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/c8/28/8c4f90e415411dc9c78d6ba10b549baa324659907c13f64bfe3779d4066c/psycopg-3.2.12-py3-none-any.whl", upload-time = 2025-10-26T00:10:42Z, size = 206765, hashes = { sha256 = "8a1611a2d4c16ae37eada46438be9029a35bb959bb50b3d0e1e93c0f3d54c9ee" } }]
+version = "3.2.13"
+sdist = { url = "https://files.pythonhosted.org/packages/44/05/d4a05988f15fcf90e0088c735b1f2fc04a30b7fc65461d6ec278f5f2f17a/psycopg-3.2.13.tar.gz", upload-time = 2025-11-21T22:34:32Z, size = 160626, hashes = { sha256 = "309adaeda61d44556046ec9a83a93f42bbe5310120b1995f3af49ab6d9f13c1d" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/a9/14/f2724bd1986158a348316e86fdd0837a838b14a711df3f00e47fba597447/psycopg-3.2.13-py3-none-any.whl", upload-time = 2025-11-21T22:29:39Z, size = 206797, hashes = { sha256 = "a481374514f2da627157f767a9336705ebefe93ea7a0522a6cbacba165da179a" } }]
 
 [[packages]]
 name = "ptyprocess"
@@ -3540,9 +3540,9 @@ wheels = [{ url = "https://files.pythonhosted.org/packages/cb/d9/656659d5b5d5f40
 
 [[packages]]
 name = "python-lsp-server"
-version = "1.13.1"
-sdist = { url = "https://files.pythonhosted.org/packages/ca/92/bd60cbe7d7d6c90e5e556a90497aa1892a3f779d9915026eca6e37a0b59b/python_lsp_server-1.13.1.tar.gz", upload-time = 2025-08-26T16:51:07Z, size = 120484, hashes = { sha256 = "bfa3d6bbca3fc3e6d0137b27cd1eabee65783a8d4314c36e1e230c603419afa3" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/36/03/2884cf7bd092d8a5a71a406971fd2edf5c6171147ca2d4afb3f2a7f8c0f1/python_lsp_server-1.13.1-py3-none-any.whl", upload-time = 2025-08-26T16:51:05Z, size = 76748, hashes = { sha256 = "fadf45275d12a9d9a13e36717a8383cee8e7cffe8a30698d38bfb3fe71b5cdcd" } }]
+version = "1.13.2"
+sdist = { url = "https://files.pythonhosted.org/packages/4b/99/3b06b8792585933d0b51307379e0337088e7f7049831c15c70f36381884d/python_lsp_server-1.13.2.tar.gz", upload-time = 2025-11-19T14:11:37Z, size = 120665, hashes = { sha256 = "d507fc6be69861740827f4e4dffa1c9b1dec97c0ead859cfef86aa342a4c7904" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/16/84/f4400dcff77bbb32717abe728bf54672d58aad57e1a6699c1beaf54ce107/python_lsp_server-1.13.2-py3-none-any.whl", upload-time = 2025-11-19T14:11:35Z, size = 76840, hashes = { sha256 = "695dbf25a2473494ae31b1b2eefb83341915f6f77bf96d2564da5bcbbf32f7f0" } }]
 
 [[packages]]
 name = "pytokens"
@@ -4627,9 +4627,9 @@ wheels = [
 
 [[packages]]
 name = "xyzservices"
-version = "2025.10.0"
-sdist = { url = "https://files.pythonhosted.org/packages/58/2b/58b3db8814e39277dd6c34aa206f7d0231ff0406284e18e03d4920a4bc78/xyzservices-2025.10.0.tar.gz", upload-time = 2025-10-30T14:46:36Z, size = 1135110, hashes = { sha256 = "c6b7648276c98e8222fbec84d9c763128cf3653705017a4d6c4c3652480ee144" } }
-wheels = [{ url = "https://files.pythonhosted.org/packages/5b/8f/447cc9cb57456d786204af0f450ffb920039104c5eff6626337c9f403bd1/xyzservices-2025.10.0-py3-none-any.whl", upload-time = 2025-10-30T14:46:34Z, size = 92737, hashes = { sha256 = "cfd6423367c7bc717ed5824d4dd7de2c91486886c1c193db9d8f0fa7fd43bc1b" } }]
+version = "2025.11.0"
+sdist = { url = "https://files.pythonhosted.org/packages/ee/0f/022795fc1201e7c29e742a509913badb53ce0b38f64b6db859e2f6339da9/xyzservices-2025.11.0.tar.gz", upload-time = 2025-11-22T11:31:51Z, size = 1135703, hashes = { sha256 = "2fc72b49502b25023fd71e8f532fb4beddbbf0aa124d90ea25dba44f545e17ce" } }
+wheels = [{ url = "https://files.pythonhosted.org/packages/ef/5c/2c189d18d495dd0fa3f27ccc60762bbc787eed95b9b0147266e72bb76585/xyzservices-2025.11.0-py3-none-any.whl", upload-time = 2025-11-22T11:31:50Z, size = 93916, hashes = { sha256 = "de66a7599a8d6dad63980b77defd1d8f5a5a9cb5fc8774ea1c6e89ca7c2a3d2f" } }]
 
 [[packages]]
 name = "yapf"
