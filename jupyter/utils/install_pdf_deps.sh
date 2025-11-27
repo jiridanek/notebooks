@@ -2,7 +2,7 @@
 
 # Install dependencies required for Notebooks PDF exports
 
-set -euxo pipefail
+set -Eeuxo pipefail
 
 # Mapping of `uname -m` values to equivalent GOARCH values
 declare -A UNAME_TO_GOARCH
@@ -23,21 +23,44 @@ if [[ "$(uname -m)" == "s390x" || "$(uname -m)" == "ppc64le" ]]; then
     exit 0
 fi
 
-# tex live installation
-echo "Installing TexLive to allow PDf export from Notebooks"
-curl -fL https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz -o install-tl-unx.tar.gz
-zcat < install-tl-unx.tar.gz | tar xf -
-rm install-tl-unx.tar.gz
-pushd install-tl-2*
-perl ./install-tl --no-interaction --scheme=scheme-small --texdir=/usr/local/texlive
-popd
-rm -rf install-tl-2*
-mv /usr/local/texlive/bin/"$(uname -m)-linux" /usr/local/texlive/bin/linux
-pushd /usr/local/texlive/bin/linux
-./tlmgr install tcolorbox pdfcol adjustbox titling enumitem soul ucs collection-fontsrecommended
-popd
+PACKAGES=(
+texlive-adjustbox
+texlive-bibtex
+texlive-charter
+texlive-ec
+texlive-euro
+texlive-eurosym
+texlive-fpl
+texlive-jknapltx
+texlive-knuth-local
+texlive-lm-math
+texlive-marvosym
+texlive-mathpazo
+texlive-mflogo-font
+texlive-parskip
+texlive-plain
+texlive-pxfonts
+texlive-rsfs
+#texlive-tcolorbox
+texlive-times
+texlive-titling
+texlive-txfonts
+texlive-ulem
+texlive-upquote
+texlive-utopia
+texlive-wasy
+texlive-wasy-type1
+texlive-wasysym
+texlive-xetex
+)
+
+dnf install -y "${PACKAGES[@]}"
+dnf clean all
+
+pdflatex --version
 
 # pandoc installation
+# https://github.com/jgm/pandoc/releases/3.7.0.2
 curl -fL "https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-${ARCH}.tar.gz"  -o /tmp/pandoc.tar.gz
 mkdir -p /usr/local/pandoc
 tar xvzf /tmp/pandoc.tar.gz --strip-components 1 -C /usr/local/pandoc/
