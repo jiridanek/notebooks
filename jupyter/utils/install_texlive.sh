@@ -19,6 +19,7 @@ texlive-parskip
 texlive-plain
 texlive-pxfonts
 texlive-rsfs
+# available in c9s but not in rhel9
 #texlive-tcolorbox
 texlive-times
 texlive-titling
