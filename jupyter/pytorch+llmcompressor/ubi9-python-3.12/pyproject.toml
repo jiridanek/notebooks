@@ -22,6 +22,9 @@ dependencies = [
     # TODO(RHAIENG-3041): Upgrade feast to ~=0.59.0 before RHOAI 3.4 GA
     "feast~=0.58.0",
     "skl2onnx~=1.19.1",
+    # As of PyTorch 2.9+, onnxscript is no longer installed by default.
+    # Required for torch.onnx.export(), exercised by test_convert_to_onnx.
+    "onnxscript",
     "odh-notebooks-meta-workbench-datascience-deps",
 
     # DB connectors

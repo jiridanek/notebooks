@@ -8,6 +8,9 @@ dependencies = [
     "tensorboard~=2.20.0",
     "torch==2.9.0",
     "torchvision==0.24.0",
+    # As of PyTorch 2.9+, onnxscript is no longer installed by default.
+    # Required for torch.onnx.export(), exercised by test_convert_to_onnx.
+    "onnxscript",
 
     # Datascience and useful extensions
     # TODO(RHAIENG-3039): Re-enable codeflare-sdk before RHOAI 3.4 GA
