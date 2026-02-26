@@ -253,7 +253,7 @@ def test_image_manifests_version_alignment(subtests: pytest_subtests.plugin.SubT
     # TODO(jdanek): review these, if any are unwarranted
     ignored_exceptions: tuple[tuple[str, tuple[str, ...]], ...] = (
         # ("package name", ("allowed version 1", "allowed version 2", ...))
-        ("Codeflare-SDK", ("0.30", "0.29")),
+        ("Codeflare-SDK", ("0.34", "0.35")),
         ("Scikit-learn", ("1.7", "1.6")),
         ("Pandas", ("2.3", "1.5")),
         (
