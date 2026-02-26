@@ -37,18 +37,18 @@ reviews:
           If missing, suggest adding one but do not treat as a hard failure.
 
         GENTLE NUDGE - Preferred format:
-          The ideal format is: "<TICKET>: <scope>, <description>"
+          The ideal format is: "<TICKET>: <scope>: <description>"
           where <scope> is one of: chore, feat, fix, docs, refactor, test, build,
           ci, style, perf, revert (optionally scoped like chore(.tekton/)).
           If the title doesn't follow this format but satisfies the strict rules
           above, just mention the preferred format as a suggestion.
 
         Valid examples:
-          - "RHAIENG-3019: chore, remove tf2onnx from pyproject.toml(s)"
-          - "NO-JIRA: chore(.tekton), update multiarch pipeline"
-          - "ISSUE #2944: chore(base-images/aipcc.sh), enable COPR repo"
-          - "[release-2.11] RHAIENG-3019: chore, remove tf2onnx"
-          - "[rhoai-2.25][RHAIENG-3209] chore(workbenches/runtimes), update llmcompressor"
+          - "RHAIENG-3019: chore: remove tf2onnx from pyproject.toml(s)"
+          - "NO-JIRA: chore(.tekton): update multiarch pipeline"
+          - "ISSUE #2944: chore(base-images/aipcc.sh): enable COPR repo"
+          - "[release-2.11] RHAIENG-3019: chore: remove tf2onnx"
+          - "[rhoai-2.25][RHAIENG-3209] chore(workbenches/runtimes): update llmcompressor"
     custom_checks:
       - name: "Branch prefix policy"
         mode: warning   # change to "error" once confirmed with the team
