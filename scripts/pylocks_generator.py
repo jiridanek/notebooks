@@ -250,11 +250,9 @@ def ensure_json_format_param(url: str) -> str:
     'https://example.com/simple/?other=1&format=json'
     """
     parsed = urlparse(url)
-    qs = parse_qs(parsed.query)
-    if "format" in qs:
-        return url
-    separator = "&" if parsed.query else ""
-    new_query = f"{parsed.query}{separator}format=json"
+    qs = parse_qs(parsed.query, keep_blank_values=True)
+    qs["format"] = ["json"]
+    new_query = urlencode(qs, doseq=True)
     return urlunparse(parsed._replace(query=new_query))
 
 

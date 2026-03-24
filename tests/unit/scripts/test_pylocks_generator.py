@@ -78,8 +78,8 @@ def test_parse_exclude_newer_real_cpu_lock_header(repo_root: Path) -> None:
     sample = repo_root / "jupyter" / "datascience" / "ubi9-python-3.12" / "uv.lock.d" / "pylock.cpu.toml"
     if not sample.is_file():
         pytest.skip("sample lockfile not present")
-    # After migration this will be non-None; before migration None is OK.
-    pg.parse_exclude_newer_from_lockfile(sample)
+    parsed = pg.parse_exclude_newer_from_lockfile(sample)
+    assert parsed is not None
 
 
 def test_resolve_exclude_newer_live_mode(tmp_path: Path) -> None:
@@ -119,6 +119,11 @@ class TestEnsureJsonFormatParam:
     def test_already_has_format_json(self) -> None:
         url = "https://example.com/simple/?format=json"
         assert pg.ensure_json_format_param(url) == url
+
+    def test_overwrites_non_json_format(self) -> None:
+        assert pg.ensure_json_format_param("https://example.com/simple/?format=html") == (
+            "https://example.com/simple/?format=json"
+        )
 
     def test_other_query_params(self) -> None:
         assert pg.ensure_json_format_param("https://example.com/simple/?other=1") == (
