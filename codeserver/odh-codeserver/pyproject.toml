@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "odh-codeserver"
+version = "4.106.3"
+description = "Pre-compiled code-server standalone release for ODH workbench images"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+
+[tool.hatch.build.targets.wheel]
+packages = ["odh_codeserver"]
+# The build hook populates odh_codeserver/data/ with the release-standalone tree;
+# hatchling's shared-data copies it to {prefix}/share/odh-codeserver/ on install,
+# keeping site-packages clean.
+shared-data = { "odh_codeserver/data" = "share/odh-codeserver" }
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+
+[tool.hatch.build.targets.sdist]
+# The sdist is intentionally small: it contains only the Python package
+# scaffolding and the build hook.  The code-server source tree, patches,
+# and build scripts live in the sibling ubi9-python-3.12/ directory and
+# are accessed via the parent directory at build time.
+#
+# When fromager builds from a git+https:// URL with #subdirectory=,
+# the entire repo (including the sibling dir) is available.
+include = [
+    "pyproject.toml",
+    "hatch_build.py",
+    "odh_codeserver/",
+]
