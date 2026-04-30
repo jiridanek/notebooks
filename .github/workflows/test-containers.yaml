@@ -1,0 +1,104 @@
+---
+name: Container Tests
+
+"on":
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tests/containers/**'
+      - 'tests/conftest.py'
+      - 'pytest.ini'
+      - '.github/workflows/test-containers.yaml'
+  push:
+    branches: [main, stable, 'rhoai-*']
+    paths:
+      - 'tests/containers/**'
+      - 'tests/conftest.py'
+      - 'pytest.ini'
+      - '.github/workflows/test-containers.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  DOCKER_HOST: "unix:///var/run/podman/podman.sock"
+  TESTCONTAINERS_RYUK_DISABLED: "true"
+  IMAGE_REGISTRY: "ghcr.io/opendatahub-io/notebooks/workbench-images"
+
+jobs:
+  container-tests:
+    name: Container Tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Setup uv and Python
+        uses: ./.github/actions/setup-uv
+
+      - name: Install deps
+        run: uv sync --locked
+
+      - name: Configure Podman
+        run: |
+          sudo systemctl daemon-reload
+          sudo systemctl enable --now podman.socket
+          sudo setfacl -m u:${USER}:x /var/run/podman
+          sudo setfacl -m u:${USER}:rw /var/run/podman/podman.sock
+
+      - name: Find latest jupyter-minimal image from main
+        id: find-image
+        shell: python
+        run: |
+          import json, os, subprocess, sys
+
+          registry = os.environ["IMAGE_REGISTRY"]
+          prefix = "jupyter-minimal-ubi9-python-3.12-main_"
+          suffix = "_odh_linux_amd64"
+
+          result = subprocess.run(
+              ["skopeo", "list-tags", f"docker://{registry}"],
+              capture_output=True, text=True, timeout=120,
+          )
+          if result.returncode != 0:
+              print(f"::error::skopeo list-tags failed: {result.stderr}", file=sys.stderr)
+              sys.exit(1)
+
+          tags = json.loads(result.stdout)["Tags"]
+          matches = sorted(t for t in tags if t.startswith(prefix) and t.endswith(suffix))
+          if not matches:
+              print(f"::error::No matching tags found with prefix={prefix} suffix={suffix}", file=sys.stderr)
+              sys.exit(1)
+
+          latest_tag = matches[-1]
+          image = f"{registry}:{latest_tag}"
+          print(f"Using image: {image}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"image={image}\n")
+
+      - name: Pull test image
+        run: |
+          sudo podman pull "${{ steps.find-image.outputs.image }}"
+          sudo podman images
+
+      - name: Run container tests
+        run: |
+          set -Eeuxo pipefail
+          uv run pytest tests/containers \
+            -m 'not openshift and not cuda and not rocm and not manifest_validation' \
+            --image="${{ steps.find-image.outputs.image }}" \
+            -v
+        env:
+          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/podman/podman.sock"
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3  # v1.2.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit.xml
