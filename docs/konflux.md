@@ -4,8 +4,6 @@ This file provides an overview and quick access links to the **Konflux** environ
 
 ## Cluster access
 
-### Login
-
 ```bash
 # ODH (stone-prd-rh01)
 oc login --web https://api.stone-prd-rh01.pg1f.p1.openshiftapps.com:6443
@@ -14,34 +12,11 @@ oc login --web https://api.stone-prd-rh01.pg1f.p1.openshiftapps.com:6443
 oc login --web https://api.stone-prod-p02.hjvn.p1.openshiftapps.com:6443
 ```
 
-After login, `oc` creates a context named `<namespace>/api-<cluster>:6443/<username>`, e.g. `open-data-hub-tenant/api-stone-prd-rh01-pg1f-p1-openshiftapps-com:6443/jdanek`.
-
-### Always use `--context` and `-n`
-
-Multiple tools (CI agents, IDE extensions, parallel terminal sessions) share the same kubeconfig. A bare `oc get pods` uses whatever context was set last, which may be the wrong cluster or namespace. Always pass `--context` and `-n` explicitly:
-
-The default context names are verbose (`open-data-hub-tenant/api-stone-prd-rh01-pg1f-p1-openshiftapps-com:6443/jdanek`). Either set shell variables per session or create persistent short aliases:
+After login, always use `--context` and `-n` to avoid conflicts when multiple sessions share the same kubeconfig. Use [`kubectx`](https://github.com/ahmetb/kubectx) to list and switch contexts, or find your context names with:
 
 ```bash
-# Option A: shell variables (ephemeral)
-ODH_CTX="$(oc config get-contexts -o name | grep 'open-data-hub-tenant.*stone-prd-rh01' | head -n1)"
-RHOAI_CTX="$(oc config get-contexts -o name | grep 'rhoai-tenant.*stone-prod-p02' | head -n1)"
-
-test -n "$ODH_CTX" || echo "ODH context not found — run: oc login --web https://api.stone-prd-rh01.pg1f.p1.openshiftapps.com:6443"
-test -n "$RHOAI_CTX" || echo "RHOAI context not found — run: oc login --web https://api.stone-prod-p02.hjvn.p1.openshiftapps.com:6443"
-
-oc get components --context "$ODH_CTX" -n open-data-hub-tenant
-oc get components --context "$RHOAI_CTX" -n rhoai-tenant
-
-# Option B: rename contexts (persistent)
-oc config rename-context "$ODH_CTX" stone-rh01-odh
-oc config rename-context "$RHOAI_CTX" stone-p02-rhoai
-
-oc get components --context stone-rh01-odh -n open-data-hub-tenant
-oc get components --context stone-p02-rhoai -n rhoai-tenant
+oc config get-contexts -o name | grep stone
 ```
-
-List your contexts with `oc config get-contexts -o name | grep stone`.
 
 ## ODH-io (Open Data Hub)
 
