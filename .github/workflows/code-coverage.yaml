@@ -32,11 +32,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
-          mkdir -p covdemo
-          printf 'def add(a, b):\n    return a + b\n' > covdemo/sample.py
-          printf 'from covdemo.sample import add\n\n\ndef test_add():\n    assert add(1, 2) == 3\n' > covdemo/test_sample.py
-          pytest covdemo -c /dev/null --cov=covdemo --cov-report=xml  # -c /dev/null: ignore repo pytest.ini (--instafail etc.)
-          echo "--- coverage.xml head ---"; head -5 coverage.xml
+          # Run in $RUNNER_TEMP so pytest doesn't pick up the repo's pytest.ini.
+          work="$RUNNER_TEMP/covdemo"
+          mkdir -p "$work"
+          cat > "$work/test_sample.py" <<'PY'
+          def add(a, b):
+              return a + b
+
+
+          def test_add():
+              assert add(1, 2) == 3
+          PY
+          cd "$work"
+          python -m pytest -p no:cacheprovider --cov=test_sample --cov-report=xml
+          cp coverage.xml "$GITHUB_WORKSPACE/coverage.xml"
+          echo "--- coverage.xml head ---"; head -5 "$GITHUB_WORKSPACE/coverage.xml"
 
       - name: Upload coverage report
         uses: actions/upload-code-coverage@1c15be36fc3733ba839b1dd643bd9556e4426dc1  # v1.4.1
