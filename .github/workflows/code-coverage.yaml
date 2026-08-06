@@ -35,7 +35,7 @@ jobs:
           mkdir -p covdemo
           printf 'def add(a, b):\n    return a + b\n' > covdemo/sample.py
           printf 'from covdemo.sample import add\n\n\ndef test_add():\n    assert add(1, 2) == 3\n' > covdemo/test_sample.py
-          pytest covdemo --cov=covdemo --cov-report=xml
+          pytest covdemo -c /dev/null --cov=covdemo --cov-report=xml  # -c /dev/null: ignore repo pytest.ini (--instafail etc.)
           echo "--- coverage.xml head ---"; head -5 coverage.xml
 
       - name: Upload coverage report
