@@ -54,3 +54,4 @@ jobs:
           file: coverage.xml
           language: Python
           label: code-coverage/pytest
+          fail-on-error: false  # feature not enabled on fork; treat 404 as warning
