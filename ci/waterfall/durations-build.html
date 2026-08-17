@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Konflux successful build duration by component</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root { font-family: ui-sans-serif, system-ui, sans-serif; color: #1a1a1a; }
+    body { margin: 1.5rem; max-width: 1200px; }
+    h1 { font-size: 1.25rem; margin: 0 0 0.25rem; }
+    .meta { color: #555; font-size: 0.9rem; margin-bottom: 1rem; }
+    #controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; }
+    #controls label { font-size: 0.85rem; }
+    #component-filter { min-width: 280px; min-height: 8rem; }
+    #chart { width: 100%; height: 640px; border: 1px solid #ddd; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.85rem; margin-top: 1.5rem; }
+    th, td { border: 1px solid #ddd; padding: 0.35rem 0.5rem; text-align: left; }
+    th { background: #f4f4f4; }
+    code { font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <h1>Konflux successful build duration by component</h1>
+  <p class="meta" id="meta"></p>
+  <div id="controls">
+    <label>Components (multi-select; empty = all)<br/>
+      <select id="component-filter" multiple></select>
+    </label>
+    <button type="button" id="select-all">All</button>
+    <button type="button" id="select-none">None</button>
+    <button type="button" id="select-slowest">10 slowest (median)</button>
+  </div>
+  <div id="chart"></div>
+  <h2>Summary (median-sorted)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Component</th><th>n</th><th>Median (min)</th>
+        <th>p95 (min)</th><th>Min</th><th>Max</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>odh-workbench-codeserver-datascience-cpu-py312-ubi9</code></td><td>11</td><td>118.9</td><td>126.7</td><td>66.2</td><td>126.7</td></tr>
+    </tbody>
+  </table>
+  <script>
+    const DATA = {"traces": [{"x": ["2026-07-10T20:38:03Z", "2026-07-11T01:56:11Z", "2026-07-11T15:17:52Z", "2026-07-13T18:59:58Z", "2026-07-16T16:30:42Z", "2026-07-20T14:39:53Z", "2026-07-21T18:11:00Z", "2026-07-22T09:22:45Z", "2026-07-23T14:51:52Z", "2026-07-24T11:47:04Z", "2026-07-25T13:30:28Z"], "y": [66.23, 119.15, 115.17, 112.65, 119.28, 126.73, 116.5, 119.52, 122.05, 117.83, 118.87], "text": ["odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pus8w9cx<br>push @ main<br>66.2 min \u00b7 sha 155e89115b4a<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pus9wtxs<br>push @ main<br>119.2 min \u00b7 sha 4a9c72d16a7e<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pussc2gm<br>push @ main<br>115.2 min \u00b7 sha 1df9dc23708d<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-puskztjm<br>push @ main<br>112.7 min \u00b7 sha f4bccf4f0464<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pusj6jvr<br>push @ main<br>119.3 min \u00b7 sha fb1ce09a3549<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pus4hsrz<br>push @ main<br>126.7 min \u00b7 sha 24e33484d096<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pusb6c7l<br>push @ main<br>116.5 min \u00b7 sha 29f525878f32<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pusztj52<br>push @ main<br>119.5 min \u00b7 sha d0b685ce564b<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pusstsjt<br>push @ main<br>122.0 min \u00b7 sha b896658b631c<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pus87jw6<br>push @ main<br>117.8 min \u00b7 sha 269a955aa19f<br>odh/archived", "odh-workbench-codeserver-datascience-cpu-py312-ubi9-on-pusw22z7<br>push @ main<br>118.9 min \u00b7 sha 68470dd989c5<br>odh/archived"], "customdata": ["https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns", "https://konflux-ui.apps.stone-prd-rh01.pg1f.p1.openshiftapps.com/ns/open-data-hub-tenant/applications/opendatahub-release/components/odh-workbench-codeserver-datascience-cpu-py312-ubi9/activity/pipelineruns"], "name": "workbench-codeserver-datascience-cpu", "full_name": "odh-workbench-codeserver-datascience-cpu-py312-ubi9", "mode": "lines+markers", "type": "scatter", "hovertemplate": "%{text}<extra></extra>"}], "title": "Konflux successful build duration by component", "source": "Source: data.json \u00b7 generated 2026-08-05 10:15 UTC \u00b7 stage=build; matrix-agg=max; steps=build; cluster=odh; event=push; component~codeserver; since=2026-05-07", "n_runs": 11, "n_components": 1};
+    const meta = document.getElementById('meta');
+    meta.textContent = DATA.source + ' · ' + DATA.n_runs + ' points · '
+      + DATA.n_components + ' series · click legend or filter to focus';
+
+    const filter = document.getElementById('component-filter');
+    DATA.traces.forEach((t, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = t.name + ' (' + t.x.length + ')';
+      opt.selected = true;
+      filter.appendChild(opt);
+    });
+
+    function selectedIndices() {
+      return Array.from(filter.selectedOptions).map(o => Number(o.value));
+    }
+
+    function draw() {
+      const idxs = selectedIndices();
+      const traces = idxs.map(i => DATA.traces[i]);
+      const layout = {
+        title: { text: DATA.title, font: { size: 14 } },
+        xaxis: { title: 'Completion time (UTC)', type: 'date' },
+        yaxis: { title: 'Duration (minutes)', rangemode: 'tozero' },
+        legend: { orientation: 'v', tracegroupgap: 2 },
+        margin: { t: 48, r: 20, b: 56, l: 64 },
+        hovermode: 'closest',
+      };
+      Plotly.newPlot('chart', traces, layout, {responsive: true, displayModeBar: true});
+    }
+
+    document.getElementById('select-all').onclick = () => {
+      Array.from(filter.options).forEach(o => { o.selected = true; });
+      draw();
+    };
+    document.getElementById('select-none').onclick = () => {
+      Array.from(filter.options).forEach(o => { o.selected = false; });
+      draw();
+    };
+    document.getElementById('select-slowest').onclick = () => {
+      Array.from(filter.options).forEach((o, i) => { o.selected = i < 10; });
+      draw();
+    };
+    filter.onchange = draw;
+    draw();
+  </script>
+</body>
+</html>
